@@ -1,16 +1,18 @@
+import Providers from "./providers";
+import ClientLayout from "./clientLayout";
+import { getServerSession } from "next-auth";
+import authOptions from '../lib/authOptions';
 import "../styles/globals.css";
-import Sidebar from "@/components/Sidebar";
-import Navbar from "@/components/Navbar";
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="en">
-      <body className="flex h-screen bg-gray-100">
-        <Sidebar />
-        <div className="flex flex-col flex-1">
-          <Navbar />
-          <main className="p-6 overflow-y-auto">{children}</main>
-        </div>
+      <body>
+        <Providers>
+          <ClientLayout session={session}>{children}</ClientLayout>
+        </Providers>
       </body>
     </html>
   );

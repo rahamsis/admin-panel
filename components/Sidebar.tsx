@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 
 const Sidebar = () => {

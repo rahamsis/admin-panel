@@ -28,8 +28,6 @@ export default function Products() {
         async function fetchData() {
             try {
                 const data = await getAllProduct("importonyperu");
-                console.log("data:")
-                console.log(data)
                 setProducts(data);
             } catch (error) {
                 console.error("Error obteniendo los productos en /product/page.tsx - 33:", error);
