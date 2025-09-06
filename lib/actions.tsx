@@ -16,7 +16,7 @@ export async function getAllProduct(tenant: string) {
 
         const data = await response.json();
 
-        return data.map((row:any) =>({
+        return data.map((row: any) => ({
             idProducto: row.idProducto,
             categoria: row.categoria,
             subCategoria: row.subCategoria,
@@ -35,5 +35,26 @@ export async function getAllProduct(tenant: string) {
     } catch (error) {
         console.error('Error al obtener los productos destacados o nuevos o más vendidos:', error);
         throw new Error("Error al obtener los productos destacados o nuevos o más vendidos");
+    }
+}
+
+export async function updateStatusProduct(tenant: string, idProduct: number, status: number) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: JSON.stringify({ idProduct, status }),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.log("Error al actualizar el estado del producto", error);
+        throw new Error("Error al actualizar el estado del producto")
     }
 }
