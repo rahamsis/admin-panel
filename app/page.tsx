@@ -22,6 +22,10 @@ export default function LoginPage() {
       redirect: true,
       callbackUrl: `${origin}/dashboard`,
     });
+
+    if (!res?.ok) {
+      return;
+    }
   };
 
   return (

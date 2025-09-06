@@ -7,7 +7,18 @@ import React, { useState, useEffect } from "react";
 
 import { usePathname } from "next/navigation";
 
-export default function ClientLayout({ children, session }: { children: React.ReactNode; session: any }) {
+interface User {
+  name: string;
+  email: string;
+  tenantId: string;
+}
+
+interface Session {
+  user: User;
+  accessToken: string;
+}
+
+export default function ClientLayout({ children, session }: { children: React.ReactNode; session: Session }) {
   const pathname = usePathname(); // Esto funciona en cliente
   const showNav = session && pathname !== "/";
 
