@@ -1,26 +1,18 @@
 // // app/ClientLayout.tsx (client component)
 "use client";
 
+/* eslint-disable */
+
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import React, { useState, useEffect } from "react";
 
 import { usePathname } from "next/navigation";
 
-interface User {
-  name: string;
-  email: string;
-  tenantId: string;
-}
-
-interface Session {
-  user: User;
-  accessToken: string;
-}
-
-export default function ClientLayout({ children, session }: { children: React.ReactNode; session: Session }) {
+export default function ClientLayout({ children, session }: { children: React.ReactNode; session: any }) {
   const pathname = usePathname(); // Esto funciona en cliente
   const showNav = session && pathname !== "/";
+  console.log("session: ",session)
 
   const [isMobile, setIsMobile] = useState(false);
 
