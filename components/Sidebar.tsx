@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
+import { useTenant } from "@/app/context/TenantContext";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 
 const Sidebar = () => {
+  const { tenantId } = useTenant();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false); // 2 en móvil, 6 en desktop
 
@@ -36,7 +40,14 @@ const Sidebar = () => {
         <div className="flex items-center p-4 text-2xl font-bold text-blue-600">
           {/* Texto Admin Panel */}
           <span className={`transition-all duration-500 ease-in-out ${isSidebarOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}`}>
-            Admin Panel
+            {/* {tenantId} */}
+            <Image
+              src={`/images/${tenantId}.png`}
+              alt={tenantId || ""}
+              width={200}
+              height={50}
+              priority={true}
+            />
           </span>
         </div>
         {/* Botón toggle (siempre visible) */}

@@ -21,6 +21,7 @@ export const config = {
     matcher: [
         "/dashboard", // protege /dashboard
         "/dashboard/:path*", // protege cualquier subruta de /dashboard
-        "/products", // protege /dashboard
+        "/products",
+        "/addProduct",
     ],
 };

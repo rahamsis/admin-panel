@@ -2,16 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { getAllProduct, updateStatusProduct } from "@/lib/actions";
-import { useSession } from "next-auth/react";
+import Link from "next/link";
 import Image from "next/image";
+import { useTenant } from "@/app/context/TenantContext";
 
 interface Productos {
     idProducto: number;
+    idCategoria: string;
     categoria: string;
+    idSubCategoria: string;
     subCategoria: string;
+    idMarca: string;
     marca: string;
     nombre: string;
     precio: number;
+    idColor: string;
     color: string;
     decripcion: string;
     imagen: string;
@@ -23,8 +28,7 @@ interface Productos {
 }
 
 export default function Products() {
-    // console.log("session: ", session?.user)
-    const { data: session } = useSession();
+    const { tenantId } = useTenant();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState<Productos[]>([]);
@@ -48,11 +52,11 @@ export default function Products() {
     useEffect(() => {
 
         async function fetchData() {
-            if (!session?.user) return;
+            // if (!session?.user) return;
 
             try {
                 setIsLoading(true);
-                const data = await getAllProduct(session?.user?.tenantId || "");
+                const data = await getAllProduct(tenantId || "");
                 setProducts(data);
             } catch (error) {
                 console.error("Error obteniendo los productos en /product/page.tsx - 33:", error);
@@ -60,12 +64,11 @@ export default function Products() {
                 setIsLoading(false);
             }
         }
-        fetchData();
 
-    }, [session]);
+        fetchData();
+    }, []);
 
     const updateStatus = async (idProduct: number, status: number) => {
-        if (!session?.user) return;
 
         // Optimistic update: actualizar UI inmediatamente
         setProducts(prevProducts =>
@@ -77,7 +80,7 @@ export default function Products() {
         );
 
         try {
-            await updateStatusProduct(session?.user?.tenantId || "", idProduct, status);
+            await updateStatusProduct(tenantId || "", idProduct, status);
         } catch (error) {
             console.error("Error al actualizar el estado del producto. ", error);
 
@@ -109,12 +112,14 @@ export default function Products() {
                 </div>
                 {/* Botón de agregar usuario */}
                 <div className=''>
-                    <button
-                        // onClick={(() => setActiveModal(true))} 
-                        className='bg-green-600 text-white px-4 py-2 rounded'>
-                        <i className="bi bi-plus-circle mr-2"></i>
-                        Nuevo
-                    </button>
+                    <Link href="/addProduct">
+                        <button
+                            className='bg-green-600 text-white px-4 py-2 rounded'>
+                            <i className="bi bi-plus-circle mr-2"></i>
+                            Nuevo
+                        </button>
+                    </Link>
+
                 </div>
             </div>
             <div className="space-y-4 pt-4">

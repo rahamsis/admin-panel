@@ -6,13 +6,14 @@
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import React, { useState, useEffect } from "react";
+import { TenantProvider } from "./context/TenantContext";
 
 import { usePathname } from "next/navigation";
 
 export default function ClientLayout({ children, session }: { children: React.ReactNode; session: any }) {
   const pathname = usePathname(); // Esto funciona en cliente
   const showNav = session && pathname !== "/";
-  console.log("session: ",session)
+  const tenantId = session?.user?.tenantId;
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -27,6 +28,7 @@ export default function ClientLayout({ children, session }: { children: React.Re
   }, []);
 
   return (
+    <TenantProvider tenantId={tenantId}>
     <div className="flex h-screen bg-gray-100">
       {showNav && <Sidebar />}
       <div className="flex flex-col flex-1">
@@ -34,6 +36,7 @@ export default function ClientLayout({ children, session }: { children: React.Re
         <main className={`p-6 overflow-y-auto ${isMobile && "ml-16"}`}>{children}</main>
       </div>
     </div>
+    </TenantProvider>
   );
 }
 
