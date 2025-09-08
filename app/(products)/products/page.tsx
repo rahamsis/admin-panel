@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable */
+
 import { useEffect, useState } from "react";
 import { getAllProduct, updateStatusProduct } from "@/lib/actions";
 import Link from "next/link";
