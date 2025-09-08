@@ -61,6 +61,7 @@ const authOptions: NextAuthOptions = {
             if (user) {
                 token.accessToken = (user as User).accessToken;
                 token.tenantId = (user as User).tenantId;
+                token.userId = (user as User).id || "";
             }
             return token;
         },
@@ -68,6 +69,7 @@ const authOptions: NextAuthOptions = {
             session.accessToken = token.accessToken as string | undefined;
             // Asegurar que `session.user` existe y agregar `userId`
             session.user = session.user || {};
+            session.user.userId = token.userId as string | undefined;
             session.user.tenantId = token.tenantId as string | undefined;
             return session;
         },

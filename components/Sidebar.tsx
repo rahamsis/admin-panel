@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { useTenant } from "@/app/context/TenantContext";
+import { useTenant } from "@/app/context/dataContext";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 

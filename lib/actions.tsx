@@ -154,14 +154,14 @@ export async function updateStatusProduct(tenant: string, idProduct: number, sta
         const data = await response.json();
         return data;
     } catch (error) {
-        console.log("Error al actualizar el estado del producto", error);
+        console.error("Error al actualizar el estado del producto", error);
         throw new Error("Error al actualizar el estado del producto")
     }
 }
 
-export async function saveProduct(tenant: string, formData: FormData) {
+export async function saveOrUpdateProduct(tenant: string, formData: FormData) {
     try {
-        const response = await fetch(`${process.env.APP_BACK_END}/save-product`, {
+        const response = await fetch(`${process.env.APP_BACK_END}/save-or-update-product`, {
             method: 'POST',
             headers: {
                 // 'Content-Type': 'application/json',
@@ -173,25 +173,102 @@ export async function saveProduct(tenant: string, formData: FormData) {
         });
 
         const data = await response.json();
-        console.log("response save product: ", data)
+
         return data;
     } catch (error) {
-        console.log("Error al guardar el producto", error);
-        throw new Error("Error al guardar el producto")
+        console.error("Error al  actualizar o guardar el producto", error);
+        throw new Error("Error al  actualizar o guardar el producto")
     }
 }
 
-// const handleUpload = async () => {
-//   if (!file) return;
+export async function saveOrUpdateCategories(tenant: string, userId: string, categoria: string) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-or-save-categorie`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: JSON.stringify({ userId, categoria }),
+            next: { revalidate: 0 }
+        });
 
-//   const formData = new FormData();
-//   formData.append("file", file);
+        const data = await response.json();
 
-//   const res = await fetch("http://localhost:3000/cloudinary/upload", {
-//     method: "POST",
-//     body: formData,
-//   });
+        return data;
 
-//   const data = await res.json();
-//   console.log("URL en Cloudinary:", data.url);
-// };
+    } catch (error) {
+        console.error('Error al actualizar o guardar la categoria:', error);
+        throw new Error("Error al actualizar o guardar la categoria");
+    }
+}
+
+export async function saveOrUpdateSubCategories(tenant: string, userId: string, subCategoria: string) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-or-save-subcategorie`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: JSON.stringify({ userId, subCategoria }),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+
+        return data;
+
+    } catch (error) {
+        console.error('Error al actualizar o guardar la subcategoria:', error);
+        throw new Error("Error al actualizar o guardar la subcategoria");
+    }
+}
+
+export async function saveOrUpdateMarca(tenant: string, userId: string, marca: string) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-or-save-marca`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: JSON.stringify({ userId, marca }),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+
+        return data;
+
+    } catch (error) {
+        console.error('Error al actualizar o guardar la marca:', error);
+        throw new Error("Error al actualizar o guardar la marca");
+    }
+}
+
+export async function saveOrUpdateColor(tenant: string, userId: string, color: string) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-or-save-color`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: JSON.stringify({ userId, color }),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+
+        return data;
+
+    } catch (error) {
+        console.error('Error al actualizar o guardar el color:', error);
+        throw new Error("Error al actualizar o guardar el color");
+    }
+}

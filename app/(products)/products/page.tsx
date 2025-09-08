@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getAllProduct, updateStatusProduct } from "@/lib/actions";
 import Link from "next/link";
 import Image from "next/image";
-import { useTenant } from "@/app/context/TenantContext";
+import { useTenant } from "@/app/context/dataContext";
 
 interface Productos {
     idProducto: number;
