@@ -1,5 +1,7 @@
 'use server';
 
+import { Producto } from "@/types/producto";
+
 /* eslint-disable */
 
 export async function getAllProduct(tenant: string) {
@@ -138,7 +140,7 @@ export async function getAllColors(tenant: string) {
     }
 }
 
-export async function updateStatusProduct(tenant: string, idProduct: number, status: number) {
+export async function updateStatusProduct(tenant: string, idProduct: string, status: number) {
     try {
         const response = await fetch(`${process.env.APP_BACK_END}/update-status`, {
             method: 'PUT',
@@ -159,9 +161,9 @@ export async function updateStatusProduct(tenant: string, idProduct: number, sta
     }
 }
 
-export async function saveOrUpdateProduct(tenant: string, formData: FormData) {
+export async function saveProduct(tenant: string, formData: FormData) {
     try {
-        const response = await fetch(`${process.env.APP_BACK_END}/save-or-update-product`, {
+        const response = await fetch(`${process.env.APP_BACK_END}/save-product`, {
             method: 'POST',
             headers: {
                 // 'Content-Type': 'application/json',
@@ -176,8 +178,30 @@ export async function saveOrUpdateProduct(tenant: string, formData: FormData) {
 
         return data;
     } catch (error) {
-        console.error("Error al  actualizar o guardar el producto", error);
-        throw new Error("Error al  actualizar o guardar el producto")
+        console.error("Error al guardar el producto", error);
+        throw new Error("Error al guardar el producto")
+    }
+}
+
+export async function updateProduct(tenant: string, formData: FormData) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-product`, {
+            method: 'PUT',
+            headers: {
+                // 'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: formData,
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error("Error al  actualizar el producto", error);
+        throw new Error("Error al  actualizar el producto")
     }
 }
 
@@ -270,5 +294,49 @@ export async function saveOrUpdateColor(tenant: string, userId: string, color: s
     } catch (error) {
         console.error('Error al actualizar o guardar el color:', error);
         throw new Error("Error al actualizar o guardar el color");
+    }
+}
+
+export async function getProductById(tenant: string, idProduct: string) {
+    console.log("datos:", tenant, idProduct)
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/product-by-idProduct?idProduct=${idProduct}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+
+        const row = data[0];
+
+        return {
+            idProducto: row.idProducto,
+            idCategoria: row.idCategoria,
+            categoria: row.categoria,
+            idSubCategoria: row.idSubCategoria,
+            subCategoria: row.subCategoria,
+            idMarca: row.idMarca,
+            marca: row.marca,
+            nombre: row.nombre,
+            precio: row.precio,
+            cantidad: row.cantidad,
+            idColor: row.idColor,
+            color: row.color,
+            descripcion: row.descripcion,
+            imagen: row.imagen,
+            destacado: row.destacado,
+            nuevo: row.nuevo,
+            masVendido: row.masVendido,
+            activo: row.activo,
+            fotos: row.fotosAdicionales?.split(',') ?? []
+        } as Producto;
+    } catch (error) {
+        console.error('Error al obtener los colores:', error);
+        throw new Error("Error al obtener los colores");
     }
 }

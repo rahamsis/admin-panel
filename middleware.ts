@@ -23,5 +23,6 @@ export const config = {
         "/dashboard/:path*", // protege cualquier subruta de /dashboard
         "/products",
         "/addProduct",
+        "/updateProduct/:path*"
     ],
 };

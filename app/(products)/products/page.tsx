@@ -7,33 +7,13 @@ import { getAllProduct, updateStatusProduct } from "@/lib/actions";
 import Link from "next/link";
 import Image from "next/image";
 import { useTenant } from "@/app/context/dataContext";
-
-interface Productos {
-    idProducto: number;
-    idCategoria: string;
-    categoria: string;
-    idSubCategoria: string;
-    subCategoria: string;
-    idMarca: string;
-    marca: string;
-    nombre: string;
-    precio: number;
-    idColor: string;
-    color: string;
-    decripcion: string;
-    imagen: string;
-    destacado: boolean;
-    nuevo: boolean;
-    masVendido: boolean;
-    activo: boolean;
-    //   fotos: string[];
-}
+import type { Producto } from "@/types/producto";
 
 export default function Products() {
     const { tenantId } = useTenant();
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [products, setProducts] = useState<Productos[]>([]);
+    const [products, setProducts] = useState<Producto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const filteredProducts = products.filter((prod) =>
@@ -70,7 +50,7 @@ export default function Products() {
         fetchData();
     }, []);
 
-    const updateStatus = async (idProduct: number, status: number) => {
+    const updateStatus = async (idProduct: string, status: number) => {
 
         // Optimistic update: actualizar UI inmediatamente
         setProducts(prevProducts =>
@@ -203,13 +183,14 @@ export default function Products() {
                                             </button>
                                     }</td>
                                     <td className="border border-gray-300 space-x-1 text-center ">
-                                        <button
-                                            className="border border-button2 p-2 rounded-md bg-green-500 text-white"
-                                            title="editar"
-                                        // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}
-                                        // disabled={!this.state.reset}
-                                        ><i className="bi bi-pencil-square"></i>
-                                        </button>
+                                        <Link href={`/updateProduct/${prod.idProducto}`}>
+                                            <button
+                                                className="border border-button2 p-2 rounded-md bg-green-500 text-white"
+                                                title="editar"
+                                            ><i className="bi bi-pencil-square"></i>
+                                            </button>
+                                        </Link>
+
                                         <button
                                             className="border border-button2 p-2 rounded-md bg-blue-500 text-white"
                                             title="Vista previa"
