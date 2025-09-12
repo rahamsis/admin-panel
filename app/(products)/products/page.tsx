@@ -30,6 +30,8 @@ export default function Products() {
     const indexOfFirstUser = indexOfLastProduct - productsPerPage;
     const currentProducts = filteredProducts.slice(indexOfFirstUser, indexOfLastProduct);
 
+    const [showDeleteText, setShowDeleteText] = useState(false);
+
     // llenar los productos
     useEffect(() => {
 
@@ -77,6 +79,11 @@ export default function Products() {
         }
     }
 
+    const cleanInputSearch = () => {
+        setSearchTerm('');
+        setShowDeleteText(false);
+    }
+
     return (
         <div className="bg-white p-6 rounded-xl shadow">
             <h2 className="text-xl font-semibold mb-4">Productos</h2>
@@ -86,11 +93,18 @@ export default function Products() {
                     <i className="absolute w-5 h-5 mt-[10px] ml-2 bi bi-search"></i>
                     <input
                         type="text"
-                        placeholder="Buscar usuario..."
-                        className="pl-16 w-10/12 lg:w-full  p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
+                        placeholder="Buscar producto..."
+                        className="pl-10 w-10/12 lg:w-full pr-10  p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => {
+                            setShowDeleteText(true)
+                            setSearchTerm(e.target.value)
+                        }}
                     />
+                    {showDeleteText &&
+                        <i className=" hover:absolute w-5 h-5 mt-[10px] -ml-7 bi bi-x-lg cursor-pointer" onClick={cleanInputSearch}></i>
+                    }
+
                 </div>
                 {/* Botón de agregar usuario */}
                 <div className=''>
@@ -104,112 +118,116 @@ export default function Products() {
 
                 </div>
             </div>
-            <div className="space-y-4 pt-4">
-                <table className="min-w-[800px] w-full table-auto border-collapse text-sm">
-                    <thead className="bg-button text-zinc-800">
-                        <tr className="bg-gray-300">
-                            <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap">#</th>
-                            <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">ID</th>
-                            <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Imagen</th>
-                            <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Nombre</th>
-                            <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Categoria</th>
-                            <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Precio</th>
-                            <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Cantidad</th>
-                            <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Estado</th>
-                            <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Acciones</th>
-                            {/* <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Eliminar</th> */}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {isLoading ? (
-                            <tr>
-                                <td colSpan={10} className="text-center py-4 text-gray-500">
-                                    <div className="flex justify-center items-center space-x-2">
-                                        <svg
-                                            className="animate-spin h-5 w-5 text-gray-500"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <circle
-                                                className="opacity-25"
-                                                cx="12"
-                                                cy="12"
-                                                r="10"
-                                                stroke="currentColor"
-                                                strokeWidth="4"
-                                            ></circle>
-                                            <path
-                                                className="opacity-75"
-                                                fill="currentColor"
-                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                            ></path>
-                                        </svg>
-                                        <span>Cargando productos...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        ) : currentProducts.length === 0 ? (
-                            <tr>
-                                <td colSpan={10} className="text-center py-4 text-gray-400">
-                                    No se encontraron usuarios.
-                                </td>
-                            </tr>
-                        ) : (
-                            currentProducts.map((prod, i) => (
-                                <tr key={i} className="odd:bg-white even:bg-gray-100">
-                                    <td className="border border-gray-300 px-3 py-2 whitespace-nowrap relative">{indexOfFirstUser + i + 1}</td>
-                                    <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{prod.idProducto}</td>
-                                    <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                                        <Image
-                                            src={prod.imagen}
-                                            alt={prod.nombre}
-                                            width={50}
-                                            height={50}
-                                            priority={true}
-                                        />
-                                    </td>
-                                    <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{prod.nombre}</td>
-                                    <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{prod.categoria}</td>
-                                    <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{prod.precio}</td>
-                                    <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{3}</td>
-                                    <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{
-                                        prod.activo ?
-                                            <button className="text-3xl" onClick={() => updateStatus(prod.idProducto, 0)}>
-                                                <i className="bi bi-check-lg text-green-600"></i>
-                                            </button> :
-                                            <button className="text-3xl" onClick={() => updateStatus(prod.idProducto, 1)}>
-                                                <i className="bi bi-x text-red-600"></i>
-                                            </button>
-                                    }</td>
-                                    <td className="border border-gray-300 space-x-1 text-center ">
-                                        <Link href={`/updateProduct/${prod.idProducto}`}>
-                                            <button
-                                                className="border border-button2 p-2 rounded-md bg-green-500 text-white"
-                                                title="editar"
-                                            ><i className="bi bi-pencil-square"></i>
-                                            </button>
-                                        </Link>
-
-                                        <button
-                                            className="border border-button2 p-2 rounded-md bg-blue-500 text-white"
-                                            title="Vista previa"
-                                        // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}
-                                        // disabled={!this.state.reset}
-                                        ><i className="bi bi-eye-fill"></i>
-                                        </button>
-                                        <button
-                                            className="border border-button2 p-2 rounded-md bg-red-500 text-white"
-                                            title="Vista previa"
-                                        // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}
-                                        // disabled={!this.state.reset}
-                                        ><i className="bi bi-trash3-fill"></i>
-                                        </button>
-                                    </td>
+            <div className="relative w-[calc(100vw-8rem)] md:w-[calc(100vw-15rem)] lg:w-[calc(100vw-18rem)] x:w-[calc(100vw-20rem)] rounded-lg">
+                <div className="space-y-4 pt-4">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-[800px] w-full table-auto border-collapse text-sm">
+                            <thead className="bg-button text-zinc-800">
+                                <tr className="bg-gray-300">
+                                    <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap">#</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">ID</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Imagen</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Nombre</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Categoria</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Precio</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Cantidad</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Estado</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Acciones</th>
+                                    {/* <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Eliminar</th> */}
                                 </tr>
-                            )))}
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan={10} className="text-center py-4 text-gray-500">
+                                            <div className="flex justify-center items-center space-x-2">
+                                                <svg
+                                                    className="animate-spin h-5 w-5 text-gray-500"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle
+                                                        className="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        strokeWidth="4"
+                                                    ></circle>
+                                                    <path
+                                                        className="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                                    ></path>
+                                                </svg>
+                                                <span>Cargando productos...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : currentProducts.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={10} className="text-center py-4 text-gray-400">
+                                            No se encontraron usuarios.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    currentProducts.map((prod, i) => (
+                                        <tr key={i} className="odd:bg-white even:bg-gray-100">
+                                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap relative">{indexOfFirstUser + i + 1}</td>
+                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{prod.idProducto}</td>
+                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
+                                                <Image
+                                                    src={prod.fotos[0].url_foto}
+                                                    alt={prod.nombre}
+                                                    width={50}
+                                                    height={50}
+                                                    priority={true}
+                                                />
+                                            </td>
+                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{prod.nombre}</td>
+                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{prod.categoria}</td>
+                                            <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{prod.precio}</td>
+                                            <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{3}</td>
+                                            <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{
+                                                prod.activo ?
+                                                    <button className="text-3xl" onClick={() => updateStatus(prod.idProducto, 0)}>
+                                                        <i className="bi bi-check-lg text-green-600"></i>
+                                                    </button> :
+                                                    <button className="text-3xl" onClick={() => updateStatus(prod.idProducto, 1)}>
+                                                        <i className="bi bi-x text-red-600"></i>
+                                                    </button>
+                                            }</td>
+                                            <td className="border border-gray-300 space-x-1 text-center ">
+                                                <Link href={`/updateProduct/${prod.idProducto}`}>
+                                                    <button
+                                                        className="border border-button2 p-2 rounded-md bg-green-500 text-white"
+                                                        title="editar"
+                                                    ><i className="bi bi-pencil-square"></i>
+                                                    </button>
+                                                </Link>
+
+                                                <button
+                                                    className="border border-button2 p-2 rounded-md bg-blue-500 text-white"
+                                                    title="Vista previa"
+                                                // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}
+                                                // disabled={!this.state.reset}
+                                                ><i className="bi bi-eye-fill"></i>
+                                                </button>
+                                                <button
+                                                    className="border border-button2 p-2 rounded-md bg-red-500 text-white"
+                                                    title="Vista previa"
+                                                // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}
+                                                // disabled={!this.state.reset}
+                                                ><i className="bi bi-trash3-fill"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             {/* <div className="flex justify-end mt-4 gap-2 mr-20">
                 <button

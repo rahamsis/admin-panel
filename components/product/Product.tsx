@@ -2,14 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import type { Producto } from "@/types/producto";
+import type {
+    Producto,
+    Fotos,
+    Categoria,
+    SubCategoria,
+    Marca,
+    Color
+} from "@/types/producto";
 import { CirclePlus } from "lucide-react";
-import CustomSelect from "../select";
 import { useTenant } from "@/app/context/dataContext";
-import { Categoria } from "@/types/categorie";
-import { SubCategoria } from "@/types/subCategorie";
-import { Marca } from "@/types/marca";
-import { Color } from "@/types/color";
+import CustomSelect from "../select";
 import {
     getAllBrands,
     getAllCategories,
@@ -19,6 +22,8 @@ import {
     updateProduct
 } from "@/lib/actions";
 import { ModalAddAttribute } from "../modales/crearAtributo";
+import { createRutaCloudinary } from "@/lib/util";
+
 
 type ProductProps = {
     data: Producto | null;
@@ -37,14 +42,17 @@ const defaultProduct: Producto = {
     idColor: "0",
     color: "",
     descripcion: "",
-    imagen: "",
     destacado: false,
     nuevo: false,
     masVendido: false,
     activo: true,
     cantidad: 0,
-    fotos: [],
-};
+    fotos: []
+}
+
+interface FotoPreview extends Fotos {
+    file?: File; // opcional, solo para las nuevas imágenes que aún no están en la DB
+}
 
 export default function Product({ data }: ProductProps) {
     const { tenantId, userId } = useTenant();
@@ -59,26 +67,25 @@ export default function Product({ data }: ProductProps) {
     const [marcas, setMarcas] = useState<Marca[]>([]);
     const [colores, setColores] = useState<Color[]>([]);
 
-    // const [destacado, setDestacado] = useState(!!data?.destacado);
-    // const [nuevo, setNuevo] = useState(!!data?.nuevo);
-    // const [masVendido, setMasVendido] = useState(!!data?.masVendido);
-    // const [activo, setActivo] = useState(!!data?.activo);
-
     const [addAtribute, setAddAttribute] = useState<{ accion: string, attribute: string } | null>(null)
 
-    const [files, setFiles] = useState<File[]>([]);
-    const [preview, setPreview] = useState<string[]>([]);
+    const [fotoDeleted, setFotoDeleted] = useState<{ idFoto: string, isPrincipal: boolean }[]>([])
+    const [preview, setPreview] = useState<FotoPreview[]>([]);
 
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(data?.idCategoria ?? "0");
+    const [nombreCategoriaSeleccionada, setNombreCategoriaSeleccionada] = useState(formData.categoria || "");
     const [subCategoriaSeleccionada, setSubCategoriaSeleccionada] = useState(data?.idSubCategoria ?? "0");
+    const [nombreSubCategoriaSeleccionada, setNombreSubCategoriaSeleccionada] = useState(formData.subCategoria || "");
     const [marcaSeleccionada, setMarcaSeleccionada] = useState(data?.idMarca ?? "0");
+    const [nombreMarcaSeleccionada, setNombreMarcaSeleccionada] = useState(formData.marca || "");
     const [colorSeleccionado, setColorSeleccionado] = useState(data?.idColor ?? "0");
+    const [nombreColorSeleccionada, setNombreColorSeleccionada] = useState(formData.color || "");
 
     const [alertNombre, setAlertNombre] = useState("");
     const [alertImagen, setAlertImagen] = useState("");
     const [alertCategoria, setAlertCategoria] = useState("");
 
-    // 🔄 sincronizar si cambia la prop data
+    // sincronizar si cambia la prop data
     useEffect(() => {
         if (data) {
             setFormData(data);
@@ -86,10 +93,6 @@ export default function Product({ data }: ProductProps) {
             setSubCategoriaSeleccionada(data.idSubCategoria);
             setMarcaSeleccionada(data.idMarca);
             setColorSeleccionado(data.idColor);
-            // setDestacado(!!data.destacado);
-            // setNuevo(!!data.nuevo);
-            // setMasVendido(!!data.masVendido);
-            // setActivo(!!data.activo);
         } else {
             setFormData(defaultProduct);
         }
@@ -99,68 +102,61 @@ export default function Product({ data }: ProductProps) {
         setValuesToDropdowns();
     }, []);
 
-    // useEffect(() => {
-    //     if (formData) {
-    //         // juntar la imagen principal + fotos adicionales
-    //         const initialImages = [
-    //             ...(formData.imagen ? [formData.imagen] : []),
-    //             ...(formData.fotos ?? [])
-    //         ];
-    //         setPreview(initialImages);
-    //     }
-    // }, [formData])
+    // sincronizar los preview si hubiera imagen
     useEffect(() => {
-        if (data) {
-            const initialImages = [
-                ...(data.imagen ? [data.imagen] : []),
-                ...(data.fotos ?? [])
-            ];
-            setPreview(initialImages);
+        if (data?.fotos) {
+            setPreview(data.fotos as FotoPreview[]);
         }
     }, [data]);
 
+    // sincronizar los dropdowns
     const setValuesToDropdowns = async () => {
         try {
-            const categories = await getAllCategories(tenantId || "");
+            const [categories, subCategories, brands, colors] = await Promise.all([
+                getAllCategories(tenantId || ""),
+                getAllSubCategories(tenantId || ""),
+                getAllBrands(tenantId || ""),
+                getAllColors(tenantId || "")
+            ]);
+
             setCategorias([{ idCategoria: "0", categoria: "- Seleccione -" }, ...categories]);
-
-            const subCategories = await getAllSubCategories(tenantId || "");
             setSubCategorias([{ idSubCategoria: "0", subCategoria: "- Seleccione -" }, ...subCategories]);
-
-            const brands = await getAllBrands(tenantId || "");
             setMarcas([{ idMarca: "0", marca: "- Seleccione -" }, ...brands]);
-
-            const colors = await getAllColors(tenantId || "");
             setColores([{ idColor: "0", color: "- Seleccione -" }, ...colors]);
         } catch (error) {
             console.error("Error obteniendo categorias, subcategorias, marcas, colores", error);
         }
-    }
-
-    const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files) return;
-        const selected = Array.from(e.target.files);
-
-        // Limitar a 3 imágenes
-        const newFiles = [...files, ...selected].slice(0, 3);
-        setFiles(newFiles);
-
-        // Previsualización
-        const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
-        setPreview(newPreviews);
-        setAlertImagen("");
     };
 
-    const handleRemove = (index: number) => {
-        const newFiles = files.filter((_, i) => i !== index);
-        setFiles(newFiles);
+    const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const fileList = e.target.files;
+        if (!fileList) return;
 
-        const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
-        setPreview(newPreviews);
+        const selected: FotoPreview[] = Array.from(fileList).map((file) => ({
+            idFoto: `temp-${Date.now()}-${Math.random()}`,
+            url_foto: URL.createObjectURL(file),
+            rutaCloudinary: "",
+            isPrincipal: false,
+            file,
+        }));
+
+        setPreview((prev) => [...prev, ...selected]);
+        setAlertImagen("");
+        e.target.value = "";
+    };
+
+    const handleRemove = (idFoto: string) => {
+        // Filtra del preview las que no coincidan
+        setPreview((prev) => prev.filter((foto) => foto.idFoto !== idFoto));
+
+        const foto = data?.fotos?.find(f => f.idFoto === idFoto);
+        if (foto) {
+            setFotoDeleted(prev => [...prev, { idFoto: foto.idFoto, isPrincipal: foto.isPrincipal }]);
+        }
     };
 
     const handleSaveProduct = async () => {
-        if (files.length === 0 && !formData.imagen) {
+        if (preview.length === 0) {
             setAlertImagen("Ingrese al menos una imagen para el producto");
             return;
         }
@@ -178,7 +174,7 @@ export default function Product({ data }: ProductProps) {
         setIsLoading(true)
 
         const fd = new FormData();
-        files.forEach((file) => fd.append("files", file)); // 👈 "files" coincide con el backend
+        preview.forEach((foto) => { if (foto.file) { fd.append("files", foto.file) } });
         fd.append("idProducto", formData.idProducto); // 👈 si viene vacío -> INSERT, si viene con id -> UPDATE
         fd.append("idCategoria", categoriaSeleccionada);
         fd.append("idSubCategoria", subCategoriaSeleccionada);
@@ -193,6 +189,21 @@ export default function Product({ data }: ProductProps) {
         fd.append("masVendido", String(formData.masVendido));
         fd.append("activo", String(formData.activo));
         fd.append("userId", String(userId));
+        fd.append("fotoDeleted", JSON.stringify(fotoDeleted));
+        fd.append("rutaCloudinary", String(
+            createRutaCloudinary(tenantId || "",
+                formData.categoria,
+                formData.subCategoria,
+                formData.marca,
+                formData.color)
+        ))
+        fd.append("nuevaRutaCloudinary", String(
+            createRutaCloudinary(tenantId || "",
+                nombreCategoriaSeleccionada,
+                nombreSubCategoriaSeleccionada,
+                nombreMarcaSeleccionada,
+                nombreColorSeleccionada)
+        ))
 
         const res = formData.idProducto
             ? await updateProduct(tenantId || "", fd)
@@ -204,7 +215,7 @@ export default function Product({ data }: ProductProps) {
         }
     };
 
-    const handleSaved = (result: any) => {
+    const handleSavedAttribute = (result: any) => {
         if (result.result.affectedRows) {
             setValuesToDropdowns();
             setAddAttribute(null);
@@ -220,7 +231,7 @@ export default function Product({ data }: ProductProps) {
 
                 <button
                     onClick={handleSaveProduct}
-                    // disabled={files.length === 0}
+                    disabled={isLoading}
                     className="hidden lg:block px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 cursor-pointer"
                 >
                     {isLoading ? (
@@ -240,6 +251,7 @@ export default function Product({ data }: ProductProps) {
 
             <div className="relative lg:flex w-full gap-6">
                 <div className="w-full lg:w-3/4 ">
+                    {/* Imagenes y preview de imagenes */}
                     <div className="flex flex-col gap-2">
                         {/* Imagenes del producto */}
                         <label className="font-semibold">
@@ -259,7 +271,7 @@ export default function Product({ data }: ProductProps) {
                             {/* Cuadrícula de previews */}
                             <div className="flex lg:flex-row flex-col gap-4 border p-3">
                                 {/* Botón cuadrado para seleccionar */}
-                                {(formData?.fotos?.length + 1) < 3 && (
+                                {(preview.length) < 3 && (
                                     <label
                                         htmlFor="fileInput"
                                         className="w-28 h-28 border-2 flex items-center justify-center cursor-pointer hover:border-cyan-500 hover:border-2"
@@ -269,15 +281,15 @@ export default function Product({ data }: ProductProps) {
                                 )}
 
                                 {/* Imágenes seleccionadas */}
-                                {preview.map((src, i) => (
+                                {preview.map((foto, i) => (
                                     <div key={i} className="relative w-28 h-28 border">
                                         <img
-                                            src={src}
+                                            src={foto.url_foto}
                                             alt={`preview-${i}`}
-                                            className="w-full h-full object-cover rounded-lg"
+                                            className="w-full h-full object-cover"
                                         />
                                         <button
-                                            onClick={() => handleRemove(i)}
+                                            onClick={() => handleRemove(foto.idFoto)}
                                             className="absolute w-5 h-5 top-1 right-1 flex items-center justify-center bg-red-600 text-white rounded-full p-1"
                                         >
                                             <i className="bi bi-x"></i>
@@ -320,7 +332,7 @@ export default function Product({ data }: ProductProps) {
                             <input
                                 type="text"
                                 placeholder="Descripcion"
-                                value={formData.descripcion}
+                                value={formData.descripcion || ""}
                                 onChange={(e) => { setFormData(prev => ({ ...prev, descripcion: e.target.value })) }}
                                 className="border p-2 w-full focus:outline-none focus:border-cyan-500 focus:ring-cyan-500"
                             />
@@ -400,8 +412,9 @@ export default function Product({ data }: ProductProps) {
                                     Categoria
                                 </label>
                                 <CustomSelect options={categorias} valueKey="idCategoria" labelKey="categoria" defaultValue={formData.idCategoria}
-                                    onChange={(value: string) => {
+                                    onChange={(value: string, label: string) => {
                                         setCategoriaSeleccionada(value)
+                                        setNombreCategoriaSeleccionada(value != "0" ? label : "")
                                         setAlertCategoria("")
                                     }} />
                                 {(categoriaSeleccionada == "null" || alertCategoria) && (
@@ -414,7 +427,10 @@ export default function Product({ data }: ProductProps) {
                                     Sub Categoria
                                 </label>
                                 <CustomSelect options={subCategorias} valueKey="idSubCategoria" labelKey="subCategoria" defaultValue={formData.idSubCategoria}
-                                    onChange={setSubCategoriaSeleccionada} />
+                                    onChange={(value: string, label: string) => {
+                                        setSubCategoriaSeleccionada(value)
+                                        setNombreSubCategoriaSeleccionada(value != "0" ? label : "")
+                                    }} />
                             </div>
 
                             <div className="flex flex-col gap-2">
@@ -422,7 +438,10 @@ export default function Product({ data }: ProductProps) {
                                     Marca
                                 </label>
                                 <CustomSelect options={marcas} valueKey="idMarca" labelKey="marca" defaultValue={formData.idMarca}
-                                    onChange={setMarcaSeleccionada} />
+                                    onChange={(value: string, label: string) => {
+                                        setMarcaSeleccionada(value)
+                                        setNombreMarcaSeleccionada(value != "0" ? label : "")
+                                    }} />
                             </div>
 
                             <div className="flex flex-col gap-2">
@@ -430,7 +449,10 @@ export default function Product({ data }: ProductProps) {
                                     Color
                                 </label>
                                 <CustomSelect options={colores} valueKey="idColor" labelKey="color" defaultValue={formData.idColor}
-                                    onChange={setColorSeleccionado} />
+                                    onChange={(value: string, label: string) => {
+                                        setColorSeleccionado(value)
+                                        setNombreColorSeleccionada(value != "0" ? label : "")
+                                    }} />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
@@ -505,8 +527,8 @@ export default function Product({ data }: ProductProps) {
 
             <div className="flex justify-center">
                 <button
-                    // onClick={handleSaveProduct}
-                    disabled={files.length === 0}
+                    onClick={handleSaveProduct}
+                    disabled={isLoading}
                     className="lg:hidden px-4 mt-6 mx-auto py-2 bg-cyan-500 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                 >
                     {isLoading ? (
@@ -528,7 +550,7 @@ export default function Product({ data }: ProductProps) {
                     accion={addAtribute.accion}
                     attribute={addAtribute.attribute}
                     onClose={() => setAddAttribute(null)}
-                    onSaved={handleSaved}
+                    onSaved={handleSavedAttribute}
                 />
             )}
         </div>

@@ -6,25 +6,25 @@ interface CustomSelectProps<T> {
     valueKey: keyof T;
     labelKey: keyof T;
     defaultValue?: string;
-    onChange?: (value: string) => void;
+    onChange?: (value: string, label: string) => void;
 }
 
 export default function CustomSelect<T>({ options, valueKey, labelKey, defaultValue, onChange }: CustomSelectProps<T>) {
     const [isOpen, setIsOpen] = useState(false);
-    const [selected, setSelected] = useState(defaultValue || String(options[0]?.[valueKey]));
+    const [selected, setSelected] = useState<{ value: string, label: string } | null>(null);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // 🔹 Cuando options cambien, setear valor inicial
     useEffect(() => {
         if (options.length > 0) {
-            if (defaultValue) {
-                setSelected(defaultValue);
-            } else {
-                setSelected(String(options[0][valueKey]));
-            }
-        }
-    }, [options, defaultValue, valueKey]);
+        const defaultOpt = options.find(o => String(o[valueKey]) === defaultValue) || options[0];
+        setSelected({ 
+            value: String(defaultOpt[valueKey]), 
+            label: String(defaultOpt[labelKey]) 
+        });
+    }
+    }, [options, defaultValue, valueKey, labelKey]);
 
     // Cerrar dropdown si se hace clic fuera
     useEffect(() => {
@@ -37,10 +37,10 @@ export default function CustomSelect<T>({ options, valueKey, labelKey, defaultVa
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handleSelect = (value: string) => {
-        setSelected(value);
+    const handleSelect = (value: string, label: string) => {
+        setSelected({ value, label });
         setIsOpen(false);
-        if (onChange) onChange(value);
+        if (onChange) onChange(value, label);
     };
 
     return (
@@ -50,7 +50,7 @@ export default function CustomSelect<T>({ options, valueKey, labelKey, defaultVa
                 className="border border-zinc-300 px-4 py-2  cursor-pointer flex justify-between items-center"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <span>{options.find(o => String(o[valueKey]) === selected)?.[labelKey] as string}</span>
+                <span>{selected?.label}</span>
                 <span className="ml-2">
                     <i className="bi bi-chevron-down"></i>
                 </span>
@@ -62,9 +62,9 @@ export default function CustomSelect<T>({ options, valueKey, labelKey, defaultVa
                     {options.map(opt => (
                         <li
                             key={String(opt[valueKey])}
-                            className={`px-4 py-2 cursor-pointer hover:bg-cyan-500 hover:text-white ${selected === String(opt[valueKey]) ? "text-zinc-800" : "text-zinc-500"
+                            className={`px-4 py-2 cursor-pointer hover:bg-cyan-500 hover:text-white ${selected?.value === String(opt[valueKey]) ? "text-zinc-800" : "text-zinc-500"
                                 }`}
-                            onClick={() => handleSelect(String(opt[valueKey]))}
+                            onClick={() => handleSelect(String(opt[valueKey]), String(opt[labelKey]))}
                         >
                             {String(opt[labelKey])}
                         </li>

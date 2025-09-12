@@ -34,7 +34,7 @@ export default function ClientLayout({ children, session }: { children: React.Re
       {showNav && <Sidebar />}
       <div className="flex flex-col flex-1">
         {showNav && <Navbar />}
-        <main className={`p-6 overflow-y-auto ${(isMobile && pathname !== "/") && "ml-16"}`}>{children}</main>
+        <main className={`p-2 lg:p-6 overflow-y-auto ${(isMobile && pathname !== "/") && "ml-16"}`}>{children}</main>
       </div>
     </div>
     </TenantProvider>

@@ -11,14 +11,14 @@ export async function getAllProduct(tenant: string) {
             headers: {
                 'Content-Type': 'application/json',
                 "X-Tenant-ID": tenant,
-                'accept': '/'
+                'accept': 'application/json'
             },
             next: { revalidate: 0 }
         });
 
-        const data = await response.json();
+        const data: Producto[] = await response.json();
 
-        return data.map((row: any) => ({
+        return data.map((row) => ({
             idProducto: row.idProducto,
             idCategoria: row.idCategoria,
             categoria: row.categoria,
@@ -28,15 +28,15 @@ export async function getAllProduct(tenant: string) {
             marca: row.marca,
             nombre: row.nombre,
             precio: row.precio,
-            idcolor: row.idColor,
+            cantidad: row.cantidad,
+            idColor: row.idColor,
             color: row.color,
             descripcion: row.descripcion,
-            imagen: row.imagen,
             destacado: row.destacado,
             nuevo: row.nuevo,
             masVendido: row.masVendido,
             activo: row.activo,
-            // fotos: row.fotosAdicionales?.split(',') ?? []
+            fotos: row.fotos
         }));
     } catch (error) {
         console.error('Error al obtener los productos destacados o nuevos o más vendidos:', error);
@@ -298,7 +298,6 @@ export async function saveOrUpdateColor(tenant: string, userId: string, color: s
 }
 
 export async function getProductById(tenant: string, idProduct: string) {
-    console.log("datos:", tenant, idProduct)
     try {
         const response = await fetch(`${process.env.APP_BACK_END}/product-by-idProduct?idProduct=${idProduct}`, {
             method: 'GET',
@@ -311,9 +310,8 @@ export async function getProductById(tenant: string, idProduct: string) {
         });
 
         const data = await response.json();
-
         const row = data[0];
-
+        
         return {
             idProducto: row.idProducto,
             idCategoria: row.idCategoria,
@@ -328,15 +326,15 @@ export async function getProductById(tenant: string, idProduct: string) {
             idColor: row.idColor,
             color: row.color,
             descripcion: row.descripcion,
-            imagen: row.imagen,
+            rutaCloudinary: row.rutaCloudinary,
             destacado: row.destacado,
             nuevo: row.nuevo,
             masVendido: row.masVendido,
             activo: row.activo,
-            fotos: row.fotosAdicionales?.split(',') ?? []
+            fotos: row.fotos
         } as Producto;
     } catch (error) {
-        console.error('Error al obtener los colores:', error);
-        throw new Error("Error al obtener los colores");
+        console.error('Error al obtener los productos por ID:', error);
+        throw new Error("Error al obtener los productos por ID");
     }
 }
