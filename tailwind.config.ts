@@ -19,6 +19,8 @@ const config: Config = {
           primary: '#1F1F1F',
           secondary: "#696969",
           Gray: "#f0f0f0",
+          sidebar: "#3b3b3f",
+          sidebarDark: "#252529",
       },
     },
     screens: {

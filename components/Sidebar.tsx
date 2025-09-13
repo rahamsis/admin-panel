@@ -6,8 +6,11 @@ import { useTenant } from "@/app/context/dataContext";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 
+import { usePathname } from "next/navigation";
+
 const Sidebar = () => {
   const { tenantId } = useTenant();
+  const pathname = usePathname();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false); // 2 en móvil, 6 en desktop
@@ -32,9 +35,9 @@ const Sidebar = () => {
       }
 
       <div
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r border-gray-200 
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar border-r border-gray-200 
               transition-all duration-500 ease-in-out md:relative md:z-0
-              ${isSidebarOpen ? "w-64" : "w-16"}`}
+              ${isSidebarOpen ? "w-52" : "w-16"}`}
       >
         {/* Header */}
         <div className="flex items-center p-4 text-2xl font-bold text-blue-600">
@@ -44,7 +47,7 @@ const Sidebar = () => {
             <Image
               src={`/images/${tenantId}.png`}
               alt={tenantId || ""}
-              width={200}
+              width={150}
               height={50}
               priority={true}
             />
@@ -61,10 +64,10 @@ const Sidebar = () => {
         </button>
 
         {/* Navegación */}
-        <nav className="flex-1 px-4 space-y-2">
+        <nav className="flex-1 space-y-2 text-zinc-400">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 p-2 hover:bg-blue-50 rounded-lg overflow-hidden"
+            className={`px-4 flex items-center gap-2 p-2 hover:bg-sidebarDark overflow-hidden ${pathname === "/dashboard" ? "bg-sidebarDark text-white" : ""}`}
           >
             <i className="bi bi-house-door-fill"></i>
             <span
@@ -77,7 +80,7 @@ const Sidebar = () => {
 
           <Link
             href="/settings"
-            className="flex items-center gap-2 p-2 hover:bg-blue-50 rounded-lg overflow-hidden"
+            className={`px-4 flex items-center gap-2 p-2 hover:bg-sidebarDark overflow-hidden ${pathname === "/settings" ? "bg-sidebarDark text-white" : ""}`}
           >
             <i className="bi bi-gear-fill"></i>
             <span
@@ -90,7 +93,7 @@ const Sidebar = () => {
 
           <Link
             href="/products"
-            className="flex items-center gap-2 p-2 hover:bg-blue-50 rounded-lg overflow-hidden"
+            className={`px-4 flex items-center gap-2 p-2 hover:bg-sidebarDark overflow-hidden ${pathname === "/products" ? "bg-sidebarDark text-white" : ""}`}
           >
             <i className="bi bi-box-seam-fill"></i>
             <span
@@ -98,6 +101,19 @@ const Sidebar = () => {
                     ${isSidebarOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}`}
             >
               Productos
+            </span>
+          </Link>
+
+          <Link
+            href="/categories"
+            className={`px-4 flex items-center gap-2 p-2 hover:bg-sidebarDark overflow-hidden ${pathname === "/categories" ? "bg-sidebarDark text-white" : ""}`}
+          >
+            <i className="bi bi-clipboard-data-fill"></i>
+            <span
+              className={`transition-all duration-500 ease-in-out
+                    ${isSidebarOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}`}
+            >
+              Categorias
             </span>
           </Link>
         </nav>

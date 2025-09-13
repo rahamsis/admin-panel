@@ -29,6 +29,7 @@ export interface Fotos {
 export interface Categoria {
     idCategoria: string;
     categoria: string;
+    activo: boolean;
 }
 
 export interface SubCategoria {

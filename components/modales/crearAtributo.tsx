@@ -6,16 +6,18 @@ import { useTenant } from "@/app/context/dataContext";
 import { saveOrUpdateCategories, saveOrUpdateColor, saveOrUpdateMarca, saveOrUpdateSubCategories } from "@/lib/actions";
 
 interface ModalAddCategorie {
+    idcategoria?: string;
     accion: string;
     attribute: string;
+    value?: string;
     onClose: () => void;
     onSaved: (result: any) => void;
 }
 
 
-export const ModalAddAttribute = ({ accion, attribute, onClose, onSaved }: ModalAddCategorie) => {
+export const ModalAddAttribute = ({ idcategoria, accion, attribute, value, onClose, onSaved }: ModalAddCategorie) => {
     const { tenantId, userId } = useTenant();
-    const [newAttribute, setNewAttribute] = useState("");
+    const [newAttribute, setNewAttribute] = useState(value || "");
     const [alert, setAlert] = useState("");
 
     const handleSubmit = async (e: any) => {
@@ -27,7 +29,7 @@ export const ModalAddAttribute = ({ accion, attribute, onClose, onSaved }: Modal
         }
 
         const result = attribute === "Categoria" ?
-            await saveOrUpdateCategories(tenantId || "", userId || "", newAttribute) : attribute === "Sub Categoria" ?
+            await saveOrUpdateCategories(tenantId || "", userId || "", idcategoria || "", newAttribute) : attribute === "Sub Categoria" ?
                 await saveOrUpdateSubCategories(tenantId || "", userId || "", newAttribute) : attribute === "Marca" ?
                     await saveOrUpdateMarca(tenantId || "", userId || "", newAttribute) : attribute === "Color" ?
                         await saveOrUpdateColor(tenantId || "", userId || "", newAttribute) : null;

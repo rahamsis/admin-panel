@@ -121,7 +121,7 @@ export default function Product({ data }: ProductProps) {
                 getAllColors(tenantId || "")
             ]);
 
-            setCategorias([{ idCategoria: "0", categoria: "- Seleccione -" }, ...categories]);
+            setCategorias([{ idCategoria: "0", categoria: "- Seleccione -" }, ...categories.filter((cat:Categoria) => cat.activo === true)]);
             setSubCategorias([{ idSubCategoria: "0", subCategoria: "- Seleccione -" }, ...subCategories]);
             setMarcas([{ idMarca: "0", marca: "- Seleccione -" }, ...brands]);
             setColores([{ idColor: "0", color: "- Seleccione -" }, ...colors]);

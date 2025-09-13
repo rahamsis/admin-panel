@@ -60,7 +60,8 @@ export async function getAllCategories(tenant: string) {
 
         return data.map((row: any) => ({
             idCategoria: row.idCategoria,
-            categoria: row.categoria
+            categoria: row.categoria,
+            activo: row.activo
         }));
     } catch (error) {
         console.error('Error al obtener las categorias:', error);
@@ -205,7 +206,7 @@ export async function updateProduct(tenant: string, formData: FormData) {
     }
 }
 
-export async function saveOrUpdateCategories(tenant: string, userId: string, categoria: string) {
+export async function saveOrUpdateCategories(tenant: string, userId: string, idCategoria: string, categoria: string) {
     try {
         const response = await fetch(`${process.env.APP_BACK_END}/update-or-save-categorie`, {
             method: 'POST',
@@ -214,7 +215,7 @@ export async function saveOrUpdateCategories(tenant: string, userId: string, cat
                 "X-Tenant-ID": tenant,
                 'accept': '/'
             },
-            body: JSON.stringify({ userId, categoria }),
+            body: JSON.stringify({ userId, categoria, idCategoria }),
             next: { revalidate: 0 }
         });
 
