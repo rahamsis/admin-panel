@@ -3,36 +3,36 @@
 /* eslint-disable */
 
 import { useEffect, useState } from "react";
-import { getAllCategories, } from "@/lib/actions";
+import { getAllColors } from "@/lib/actions";
 import Link from "next/link";
 import { useTenant } from "@/app/context/dataContext";
-import type { Categoria } from "@/types/producto";
+import type { Color } from "@/types/producto";
 import { ModalAddAttribute } from "@/components/modales/crearAtributo";
 
-export default function Categories() {
+export default function Colors() {
     const { tenantId } = useTenant();
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [categories, setCategories] = useState<Categoria[]>([]);
+    const [colors, setColors] = useState<Color[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const filteredCategories = categories.filter((cat) =>
-        cat.categoria.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredColors = colors.filter((col) =>
+        col.color.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const [currentPage, setCurrentPage] = useState(1);
-    const categoriesPerPage = 20;
+    const colorsPerPage = 20;
 
     // Calcular número total de páginas
-    const totalPages = Math.ceil(filteredCategories.length / categoriesPerPage);
+    const totalPages = Math.ceil(filteredColors.length / colorsPerPage);
 
-    const indexOfLastCategorie = currentPage * categoriesPerPage;
-    const indexOfFirstUser = indexOfLastCategorie - categoriesPerPage;
-    const currentCategories = filteredCategories.slice(indexOfFirstUser, indexOfLastCategorie);
+    const indexOfLastColor = currentPage * colorsPerPage;
+    const indexOfFirstUser = indexOfLastColor - colorsPerPage;
+    const currentColors = filteredColors.slice(indexOfFirstUser, indexOfLastColor);
 
     const [showDeleteText, setShowDeleteText] = useState(false);
 
-    const [addAtribute, setAddAttribute] = useState<{ idCategoria: string, accion: string, attribute: string, value: string } | null>(null)
+    const [addAtribute, setAddAttribute] = useState<{ idColor: string, accion: string, attribute: string, value: string } | null>(null)
 
     // llenar los productos
     useEffect(() => {
@@ -42,10 +42,10 @@ export default function Categories() {
 
             try {
                 setIsLoading(true);
-                const data = await getAllCategories(tenantId || "");
-                setCategories(data);
+                const data = await getAllColors(tenantId || "");
+                setColors(data);
             } catch (error) {
-                console.error("Error obteniendo las categorias:", error);
+                console.error("Error obteniendo las colores:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -92,20 +92,20 @@ export default function Categories() {
         }
 
         // 👇 recargar todas las categorías
-        const updatedCategories = await getAllCategories(tenantId || "");
-        setCategories(updatedCategories);
+        const updatedColors = await getAllColors(tenantId || "");
+        setColors(updatedColors);
     }
 
     return (
         <div className="bg-white p-6 rounded-xl shadow">
-            <h2 className="text-xl font-semibold mb-4">Categorias</h2>
+            <h2 className="text-xl font-semibold mb-4">Colores</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 w-full x:w-1/2 gap-4">
                 {/* Barra de búsqueda */}
                 <div className="">
                     <i className="absolute w-5 h-5 mt-[10px] ml-2 bi bi-search"></i>
                     <input
                         type="text"
-                        placeholder="Buscar categoria ..."
+                        placeholder="Buscar Colores ..."
                         className="pl-10 w-10/12 lg:w-full pr-10  p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
                         value={searchTerm}
                         onChange={(e) => {
@@ -138,7 +138,7 @@ export default function Categories() {
                                 <tr className="bg-gray-300">
                                     <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap">#</th>
                                     <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">ID</th>
-                                    <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Categoria</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Color</th>
                                     <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Estado</th>
                                     <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Acciones</th>
                                     {/* <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Eliminar</th> */}
@@ -169,28 +169,28 @@ export default function Categories() {
                                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                                                     ></path>
                                                 </svg>
-                                                <span>Cargando categorias...</span>
+                                                <span>Cargando marcas...</span>
                                             </div>
                                         </td>
                                     </tr>
-                                ) : currentCategories.length === 0 ? (
+                                ) : currentColors.length === 0 ? (
                                     <tr>
                                         <td colSpan={5} className="text-center py-4 text-gray-400">
-                                            No se encontraron categorias.
+                                            No se encontraron marcas.
                                         </td>
                                     </tr>
                                 ) : (
-                                    currentCategories.map((cat, i) => (
+                                    currentColors.map((col, i) => (
                                         <tr key={i} className="odd:bg-white even:bg-gray-100">
                                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap relative">{indexOfFirstUser + i + 1}</td>
-                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{cat.idCategoria}</td>
-                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{cat.categoria}</td>
+                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{col.idColor}</td>
+                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{col.color}</td>
                                             <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{
-                                                cat.activo ?
-                                                    <button className="text-3xl" onClick={() => updateStatus(cat.idCategoria, 0)}>
+                                                col.activo ?
+                                                    <button className="text-3xl" onClick={() => updateStatus(col.idColor, 0)}>
                                                         <i className="bi bi-check-lg text-green-600"></i>
                                                     </button> :
-                                                    <button className="text-3xl" onClick={() => updateStatus(cat.idCategoria, 1)}>
+                                                    <button className="text-3xl" onClick={() => updateStatus(col.idColor, 1)}>
                                                         <i className="bi bi-x text-red-600"></i>
                                                     </button>
                                             }</td>
@@ -198,7 +198,7 @@ export default function Categories() {
                                                 <button
                                                     className="border border-button2 p-2 rounded-md bg-green-500 text-white"
                                                     title="editar"
-                                                    onClick={() => setAddAttribute({ idCategoria: cat.idCategoria, accion: "Actualizar ", attribute: "Categoria", value: cat.categoria })}
+                                                    onClick={() => setAddAttribute({ idColor: col.idColor, accion: "Actualizar ", attribute: "Categoria", value: col.color })}
                                                 ><i className="bi bi-pencil-square"></i>
                                                 </button>
 
@@ -220,7 +220,7 @@ export default function Categories() {
 
             <div className="flex flex-row mt-6 justify-between mr-10">
                 <div className="text-zinc-600 flex lg:text-base text-xs items-center">
-                    <span>Mostrando {filteredCategories.length === 0 ? 0 : indexOfFirstUser + 1} - {Math.min(indexOfLastCategorie, filteredCategories.length)} de {categories.length} categoria(s)</span>
+                    <span>Mostrando {filteredColors.length === 0 ? 0 : indexOfFirstUser + 1} - {Math.min(indexOfLastColor, filteredColors.length)} de {colors.length} color(es)</span>
                 </div>
 
                 <div className="flex justify-center gap-1">
@@ -252,7 +252,7 @@ export default function Categories() {
 
             {addAtribute && (
                 <ModalAddAttribute
-                    idcategoria={addAtribute.idCategoria}
+                    idcategoria={addAtribute.idColor}
                     accion={addAtribute.accion}
                     attribute={addAtribute.attribute}
                     value={addAtribute.value}

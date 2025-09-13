@@ -85,7 +85,8 @@ export async function getAllSubCategories(tenant: string) {
 
         return data.map((row: any) => ({
             idSubCategoria: row.idSubCategoria,
-            subCategoria: row.subCategoria
+            subCategoria: row.subCategoria,
+            activo: row.activo
         }));
     } catch (error) {
         console.error('Error al obtener las subCategorias:', error);
@@ -109,7 +110,8 @@ export async function getAllBrands(tenant: string) {
 
         return data.map((row: any) => ({
             idMarca: row.idMarca,
-            marca: row.marca
+            marca: row.marca,
+            activo: row.activo
         }));
     } catch (error) {
         console.error('Error al obtener las marcas:', error);
@@ -133,7 +135,8 @@ export async function getAllColors(tenant: string) {
 
         return data.map((row: any) => ({
             idColor: row.idColor,
-            color: row.color
+            color: row.color,
+            activo: row.activo
         }));
     } catch (error) {
         console.error('Error al obtener los colores:', error);

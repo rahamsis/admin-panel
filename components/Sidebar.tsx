@@ -116,6 +116,45 @@ const Sidebar = () => {
               Categorias
             </span>
           </Link>
+
+          <Link
+            href="/sub-categories"
+            className={`px-4 flex items-center gap-2 p-2 hover:bg-sidebarDark overflow-hidden ${pathname === "/sub-categories" ? "bg-sidebarDark text-white" : ""}`}
+          >
+            <i className="bi bi-hdd-stack-fill"></i>
+            <span
+              className={`transition-all duration-500 ease-in-out
+                    ${isSidebarOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}`}
+            >
+              SubCategorias
+            </span>
+          </Link>
+
+          <Link
+            href="/brands"
+            className={`px-4 flex items-center gap-2 p-2 hover:bg-sidebarDark overflow-hidden ${pathname === "/brands" ? "bg-sidebarDark text-white" : ""}`}
+          >
+            <i className="bi bi-handbag-fill"></i>
+            <span
+              className={`transition-all duration-500 ease-in-out
+                    ${isSidebarOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}`}
+            >
+              Marcas
+            </span>
+          </Link>
+
+          <Link
+            href="/colors"
+            className={`px-4 flex items-center gap-2 p-2 hover:bg-sidebarDark overflow-hidden ${pathname === "/colors" ? "bg-sidebarDark text-white" : ""}`}
+          >
+            <i className="bi bi-palette-fill"></i>
+            <span
+              className={`transition-all duration-500 ease-in-out
+                    ${isSidebarOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}`}
+            >
+              Colores
+            </span>
+          </Link>
         </nav>
       </div>
 

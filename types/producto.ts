@@ -35,14 +35,17 @@ export interface Categoria {
 export interface SubCategoria {
     idSubCategoria: string;
     subCategoria: string;
+    activo: boolean;
 }
 
 export interface Marca {
     idMarca: string;
     marca: string;
+    activo: boolean;
 }
 
 export interface Color {
     idColor: string;
     color: string;
+    activo: boolean;
 }
