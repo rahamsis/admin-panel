@@ -342,3 +342,87 @@ export async function getProductById(tenant: string, idProduct: string) {
         throw new Error("Error al obtener los productos por ID");
     }
 }
+
+export async function updateStatusCategorie(tenant: string, idCategoria: string, status: number) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-status-categorie`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: JSON.stringify({ idCategoria, status }),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error al actualizar el estado de la categoria", error);
+        throw new Error("Error al actualizar el estado de la categoria")
+    }
+}
+
+export async function updateStatusSubCategorie(tenant: string, idSubCategoria: string, status: number) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-status-subcategorie`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: JSON.stringify({ idSubCategoria, status }),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error al actualizar el estado de la subcategoria", error);
+        throw new Error("Error al actualizar el estado de la subcategoria")
+    }
+}
+
+export async function updateStatusBrand(tenant: string, idMarca: string, status: number) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-status-brand`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: JSON.stringify({ idMarca, status }),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error al actualizar el estado de la marca", error);
+        throw new Error("Error al actualizar el estado de la marca")
+    }
+}
+
+export async function updateStatusColor(tenant: string, idColor: string, status: number) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-status-color`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: JSON.stringify({ idColor, status }),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error al actualizar el estado del color", error);
+        throw new Error("Error al actualizar el estado del color")
+    }
+}

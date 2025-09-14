@@ -16,25 +16,13 @@ export default function ClientLayout({ children, session }: { children: React.Re
   const tenantId = session?.user?.tenantId;
   const userId = session?.user?.userId;
 
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detectar tamaño de pantalla para 2 / 6 visibles
-  useEffect(() => {
-    const check = () => {
-      setIsMobile(window.innerWidth >= 1024 ? false : true)
-    };
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
   return (
     <TenantProvider tenantId={tenantId} userId={userId}>
     <div className="flex h-screen bg-gray-100">
       {showNav && <Sidebar />}
       <div className="flex flex-col flex-1">
         {showNav && <Navbar />}
-        <main className={`p-2 lg:p-6 overflow-y-auto ${(isMobile && pathname !== "/") && "ml-16"}`}>{children}</main>
+        <main className={`p-0 lg:p-6 overflow-y-auto`}>{children}</main>
       </div>
     </div>
     </TenantProvider>

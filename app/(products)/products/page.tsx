@@ -85,40 +85,56 @@ export default function Products() {
     }
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 lg:rounded-xl shadow min-h-screen">
             <h2 className="text-xl font-semibold mb-4">Productos</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 w-full x:w-1/2 gap-4">
+            <div className="flex flex-row w-full x:w-1/2 gap-4">
+
                 {/* Barra de búsqueda */}
-                <div className="">
-                    <i className="absolute w-5 h-5 mt-[10px] ml-2 bi bi-search"></i>
+                <div className="relative w-full">
+                    {/* Icono de búsqueda */}
+                    <i className="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+
+                    {/* Input */}
                     <input
                         type="text"
-                        placeholder="Buscar producto..."
-                        className="pl-10 w-10/12 lg:w-full pr-10  p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
+                        placeholder="Buscar Subcategoria ..."
+                        className="w-full pl-10 pr-10 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
                         value={searchTerm}
                         onChange={(e) => {
-                            setShowDeleteText(true)
-                            setSearchTerm(e.target.value)
+                            setShowDeleteText(true);
+                            setSearchTerm(e.target.value);
                         }}
                     />
-                    {showDeleteText &&
-                        <i className=" hover:absolute w-5 h-5 mt-[10px] -ml-7 bi bi-x-lg cursor-pointer" onClick={cleanInputSearch}></i>
-                    }
 
+                    {/* Icono de limpiar */}
+                    {showDeleteText && (
+                        <i
+                            className="bi bi-x-lg absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-red-500"
+                            onClick={cleanInputSearch}
+                        ></i>
+                    )}
                 </div>
+
                 {/* Botón de agregar usuario */}
                 <div className=''>
                     <Link href="/addProduct">
                         <button
-                            className='bg-green-600 text-white px-4 py-2 rounded'>
+                            className='hidden lg:flex bg-cyan-600 text-white px-4 py-2 rounded'>
                             <i className="bi bi-plus-circle mr-2"></i>
                             Nuevo
                         </button>
                     </Link>
 
+                    <Link href="/addProduct">
+                        <div className="lg:hidden text-cyan-500 text-3xl" title="Agregar categoria" >
+                            <i className="bi bi-plus-circle-fill"></i>
+                        </div>
+                    </Link>
                 </div>
             </div>
-            <div className="relative w-[calc(100vw-8rem)] md:w-[calc(100vw-15rem)] lg:w-[calc(100vw-18rem)] x:w-[calc(100vw-20rem)] rounded-lg">
+
+            {/* en mobiles ocultar */}
+            <div className="relative w-[calc(100vw-8rem)] md:w-[calc(100vw-15rem)] lg:w-[calc(100vw-18rem)] x:w-[calc(100vw-20rem)] rounded-lg hidden lg:block">
                 <div className="space-y-4 pt-4">
                     <div className="overflow-x-auto">
                         <table className="min-w-[800px] w-full table-auto border-collapse text-sm">
@@ -250,7 +266,9 @@ export default function Products() {
                     Siguiente
                 </button>
             </div> */}
-            <div className="flex flex-row mt-6 justify-between">
+
+            {/* en mobiles ocultar */}
+            <div className="lg:flex flex-row mt-6 justify-between mr-10 hidden">
                 <div className="text-zinc-600 flex lg:text-base text-xs items-center">
                     <span>Mostrando {filteredProducts.length === 0 ? 0 : indexOfFirstUser + 1} - {Math.min(indexOfLastProduct, filteredProducts.length)} de {products.length} producto(s)</span>
                 </div>
@@ -280,6 +298,67 @@ export default function Products() {
                         <i className="bi bi-chevron-right"></i>
                     </button>
                 </div>
+            </div>
+
+            <div className="lg:hidden mt-6">
+                {
+                    currentProducts.map((prod, i) => (
+                        <div key={i} className="border border-gray-300 rounded-lg p-4 mb-4 bg-white shadow-sm">
+                            <div className="flex items-center justify-between gap-2 w-full">
+                                {/* --- IZQUIERDA: imagen + datos --- */}
+                                <div className="flex items-center gap-2">
+                                    <Image
+                                        src={prod.fotos[0].url_foto}
+                                        alt={prod.nombre}
+                                        width={50}
+                                        height={50}
+                                        priority={true}
+                                    />
+                                    <div>
+                                        <h3 className="text-sm">{prod.nombre}</h3>
+                                        <p className="text-xs text-gray-500">ID: {prod.idProducto}</p>
+                                    </div>
+                                </div>
+
+                                {/* --- DERECHA: botones de acciones --- */}
+                                <div className="flex items-center space-x-2">
+                                    {prod.activo ? (
+                                        <button
+                                            className="text-3xl"
+                                            onClick={() => updateStatus(prod.idProducto, 0)}
+                                        >
+                                            <i className="bi bi-check-lg text-green-600"></i>
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="text-3xl"
+                                            onClick={() => updateStatus(prod.idProducto, 1)}
+                                        >
+                                            <i className="bi bi-x text-red-600"></i>
+                                        </button>
+                                    )}
+
+                                    <Link href={`/updateProduct/${prod.idProducto}`}>
+                                        <button
+                                            className="border border-button2 p-2 rounded-md bg-cyan-500 text-white"
+                                            title="Editar"
+                                        >
+                                            <i className="bi bi-pencil-square"></i>
+                                        </button>
+                                    </Link>
+
+                                    <button
+                                        className="border border-button2 p-2 rounded-md bg-red-500 text-white"
+                                        title="Eliminar"
+                                    >
+                                        <i className="bi bi-trash3-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    ))
+                }
             </div>
         </div>
     );

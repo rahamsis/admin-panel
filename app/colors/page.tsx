@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 import { useEffect, useState } from "react";
-import { getAllColors } from "@/lib/actions";
+import { getAllColors, updateStatusColor } from "@/lib/actions";
 import Link from "next/link";
 import { useTenant } from "@/app/context/dataContext";
 import type { Color } from "@/types/producto";
@@ -54,31 +54,28 @@ export default function Colors() {
         fetchData();
     }, []);
 
-    const updateStatus = async (idProduct: string, status: number) => {
+    const updateStatus = async (idColor: string, status: number) => {
+        // 1️⃣ Guardamos el valor previo (para poder revertir en caso de error)
+        const prevColors = [...colors];
 
-        // // Optimistic update: actualizar UI inmediatamente
-        // setProducts(prevProducts =>
-        //     prevProducts.map(product =>
-        //         product.idProducto === idProduct
-        //             ? { ...product, activo: status === 1 }
-        //             : product
-        //     )
-        // );
+        // 2️⃣ Optimistic update: actualizamos el UI inmediatamente
+        setColors(prev =>
+            prev.map(color =>
+                color.idColor === idColor
+                    ? { ...color, activo: status === 1 } // vuelve al valor que tenía en prevProducts
+                    : color
+            )
+        );
 
-        // try {
-        //     await updateStatusProduct(tenantId || "", idProduct, status);
-        // } catch (error) {
-        //     console.error("Error al actualizar el estado del producto. ", error);
+        try {
+            // 3️⃣ Llamada al backend
+            await updateStatusColor(tenantId || "", idColor, status);
+        } catch (error) {
+            console.error("Error al actualizar el estado del color. ", error);
 
-        //     // 🔄 Revertir usando el valor anterior
-        //     setProducts(prevProducts =>
-        //         prevProducts.map(product =>
-        //             product.idProducto === idProduct
-        //                 ? { ...product, activo: product.activo } // vuelve al valor que tenía en prevProducts
-        //                 : product
-        //         )
-        //     );
-        // }
+            // 4️⃣ Rollback: restauramos el estado anterior
+            setColors(prevColors);
+        }
     }
 
     const cleanInputSearch = () => {
@@ -97,40 +94,52 @@ export default function Colors() {
     }
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 lg:rounded-xl shadow min-h-screen">
             <h2 className="text-xl font-semibold mb-4">Colores</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 w-full x:w-1/2 gap-4">
+            <div className="flex flex-row w-full x:w-1/2 gap-4">
+
                 {/* Barra de búsqueda */}
-                <div className="">
-                    <i className="absolute w-5 h-5 mt-[10px] ml-2 bi bi-search"></i>
+                <div className="relative w-full">
+                    {/* Icono de búsqueda */}
+                    <i className="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+
+                    {/* Input */}
                     <input
                         type="text"
-                        placeholder="Buscar Colores ..."
-                        className="pl-10 w-10/12 lg:w-full pr-10  p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
+                        placeholder="Buscar Subcategoria ..."
+                        className="w-full pl-10 pr-10 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
                         value={searchTerm}
                         onChange={(e) => {
-                            setShowDeleteText(true)
-                            setSearchTerm(e.target.value)
+                            setShowDeleteText(true);
+                            setSearchTerm(e.target.value);
                         }}
                     />
-                    {showDeleteText &&
-                        <i className=" hover:absolute w-5 h-5 mt-[10px] -ml-7 bi bi-x-lg cursor-pointer" onClick={cleanInputSearch}></i>
-                    }
 
+                    {/* Icono de limpiar */}
+                    {showDeleteText && (
+                        <i
+                            className="bi bi-x-lg absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-red-500"
+                            onClick={cleanInputSearch}
+                        ></i>
+                    )}
                 </div>
-                {/* Botón de agregar usuario */}
-                <div className=''>
-                    <Link href="/addProduct">
-                        <button
-                            className='bg-green-600 text-white px-4 py-2 rounded'>
-                            <i className="bi bi-plus-circle mr-2"></i>
-                            Nuevo
-                        </button>
-                    </Link>
 
+                {/* Botón de agregar usuario */}
+                <div className='hidden lg:flex lg:flex-row border'>
+                    <button
+                        className='bg-cyan-500 text-white px-4 py-2 rounded' onClick={() => setAddAttribute({ idColor: "", accion: "Crear ", attribute: "Color", value: "" })}>
+                        <i className="bi bi-plus-circle mr-2"></i>
+                        Nuevo
+                    </button>
+                </div>
+
+                <div className="lg:hidden text-cyan-500 text-3xl" title="Agregar categoria" onClick={() => setAddAttribute({ idColor: "", accion: "Crear ", attribute: "Color", value: "" })}>
+                    <i className="bi bi-plus-circle-fill"></i>
                 </div>
             </div>
-            <div className="relative w-[calc(100vw-8rem)] md:w-[calc(100vw-15rem)] lg:w-[calc(100vw-18rem)] x:w-[calc(100vw-20rem)] rounded-lg">
+
+            {/* en mobiles ocultar */}
+            <div className="relative w-[calc(100vw-8rem)] md:w-[calc(100vw-15rem)] lg:w-[calc(100vw-18rem)] x:w-[calc(100vw-20rem)] rounded-lg hidden lg:block">
                 <div className="space-y-4 pt-4">
                     <div className="overflow-x-auto">
                         <table className="min-w-[800px] w-full table-auto border-collapse text-sm">
@@ -218,7 +227,8 @@ export default function Colors() {
                 </div>
             </div>
 
-            <div className="flex flex-row mt-6 justify-between mr-10">
+            {/* en mobiles ocultar */}
+            <div className="lg:flex flex-row mt-6 justify-between mr-10 hidden">
                 <div className="text-zinc-600 flex lg:text-base text-xs items-center">
                     <span>Mostrando {filteredColors.length === 0 ? 0 : indexOfFirstUser + 1} - {Math.min(indexOfLastColor, filteredColors.length)} de {colors.length} color(es)</span>
                 </div>
@@ -248,6 +258,44 @@ export default function Colors() {
                         <i className="bi bi-chevron-right"></i>
                     </button>
                 </div>
+            </div>
+
+            <div className="lg:hidden mt-6">
+                {
+                    currentColors.map((col, i) => (
+                        <div key={i} className="border border-gray-300 rounded-lg p-4 mb-4 bg-white shadow-sm">
+                            <div className="flex justify-between items-center mb-2">
+                                <div>
+                                    <h3 className="text-lg">{col.color}</h3>
+                                    <p className="text-sm text-gray-500">ID: {col.idColor}</p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    {col.activo ?
+                                        <button className="text-3xl" onClick={() => updateStatus(col.idColor, 0)}>
+                                            <i className="bi bi-check-lg text-green-600"></i>
+                                        </button> :
+                                        <button className="text-3xl" onClick={() => updateStatus(col.idColor, 1)}>
+                                            <i className="bi bi-x text-red-600"></i>
+                                        </button>
+                                    }
+                                    <button
+                                        className="border border-button2 p-2 rounded-md bg-cyan-500 text-white"
+                                        title="editar"
+                                        onClick={() => setAddAttribute({ idColor: col.idColor, accion: "Actualizar ", attribute: "Color", value: col.color })}
+                                    ><i className="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button
+                                        className="border border-button2 p-2 rounded-md bg-red-500 text-white"
+                                        title="Vista previa"
+                                    // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}  
+                                    // disabled={!this.state.reset}
+                                    ><i className="bi bi-trash3-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                }
             </div>
 
             {addAtribute && (
