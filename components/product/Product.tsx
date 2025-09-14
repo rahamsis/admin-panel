@@ -120,11 +120,11 @@ export default function Product({ data }: ProductProps) {
                 getAllBrands(tenantId || ""),
                 getAllColors(tenantId || "")
             ]);
-
-            setCategorias([{ idCategoria: "0", categoria: "- Seleccione -" }, ...categories.filter((cat:Categoria) => cat.activo === true)]);
-            setSubCategorias([{ idSubCategoria: "0", subCategoria: "- Seleccione -" }, ...subCategories.filter((scat:Categoria) => scat.activo === true)]);
-            setMarcas([{ idMarca: "0", marca: "- Seleccione -" }, ...brands.filter((brd:Categoria) => brd.activo === true)]);
-            setColores([{ idColor: "0", color: "- Seleccione -" }, ...colors.filter((col:Categoria) => col.activo === true)]);
+            console.log({ categories, subCategories, brands, colors });
+            setCategorias([{ idCategoria: "0", categoria: "- Seleccione -" }, ...categories]);
+            setSubCategorias([{ idSubCategoria: "0", subCategoria: "- Seleccione -" }, ...subCategories]);
+            setMarcas([{ idMarca: "0", marca: "- Seleccione -" }, ...brands]);
+            setColores([{ idColor: "0", color: "- Seleccione -" }, ...colors]);
         } catch (error) {
             console.error("Error obteniendo categorias, subcategorias, marcas, colores", error);
         }
