@@ -225,7 +225,7 @@ export default function Product({ data }: ProductProps) {
     }
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white p-6 lg:rounded-xl shadow">
             <div className="flex justify-between flex-row">
                 <h2 className="text-xl font-semibold mb-4">
                     {data ? "Editar Producto" : "Agregar Producto"}
@@ -346,14 +346,14 @@ export default function Product({ data }: ProductProps) {
                             </label>
 
                             <button
-                                className="border w-48 p-2 text-left border-cyan-500 text-cyan-500 space-x-2 hover:bg-cyan-500 hover:text-white"
+                                className="border flex justify-center w-full lg:w-48 p-2 text-left border-cyan-500 text-cyan-500 space-x-2 hover:bg-cyan-500 hover:text-white"
                                 onClick={() => setAddAttribute({ accion: "Agregar ", attribute: "Categoria" })}>
                                 <i className="bi bi-plus-circle-fill"></i>
                                 <a>Añadir categoria</a>
                             </button>
 
                             <button
-                                className="border w-48 p-2 text-left border-cyan-500 text-cyan-500 space-x-2 hover:bg-cyan-500 hover:text-white"
+                                className="border flex justify-center w-full lg:w-48 p-2 text-left border-cyan-500 text-cyan-500 space-x-2 hover:bg-cyan-500 hover:text-white"
                                 onClick={() => setAddAttribute({ accion: "Agregar ", attribute: "Sub Categoria" })}
                             >
                                 <i className="bi bi-plus-circle-fill"></i>
@@ -361,14 +361,14 @@ export default function Product({ data }: ProductProps) {
                             </button>
 
                             <button
-                                className="border w-48 p-2 text-left border-cyan-500 text-cyan-500 space-x-2 hover:bg-cyan-500 hover:text-white"
+                                className="border flex justify-center w-full lg:w-48 p-2 text-left border-cyan-500 text-cyan-500 space-x-2 hover:bg-cyan-500 hover:text-white"
                                 onClick={() => setAddAttribute({ accion: "Agregar ", attribute: "Marca" })}>
                                 <i className="bi bi-plus-circle-fill"></i>
                                 <a>Añadir marca</a>
                             </button>
 
                             <button
-                                className="border w-48 p-2 text-left border-cyan-500 text-cyan-500 space-x-2 hover:bg-cyan-500 hover:text-white"
+                                className="border flex justify-center w-full lg:w-48 p-2 text-left border-cyan-500 text-cyan-500 space-x-2 hover:bg-cyan-500 hover:text-white"
                                 onClick={() => setAddAttribute({ accion: "Agregar ", attribute: "Color" })}>
                                 <i className="bi bi-plus-circle-fill"></i>
                                 <a>Añadir color</a>
@@ -377,7 +377,7 @@ export default function Product({ data }: ProductProps) {
                     </div>
                 </div>
 
-                <div className="w-full lg:w-1/4">
+                <div className="w-full lg:w-1/4 pt-5">
                     <div className="grid gap-4">
                         {/* Cantidad */}
                         <div className="flex flex-col gap-2">
@@ -457,7 +457,7 @@ export default function Product({ data }: ProductProps) {
                                     }} />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+                            <div className="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4">
                                 <div className="flex flex-col gap-2">
                                     <label className="font-semibold text-sm">
                                         Destacado

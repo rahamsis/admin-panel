@@ -270,25 +270,25 @@ export default function Categories() {
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     {cat.activo ?
-                                        <button className="text-3xl" onClick={() => updateStatus(cat.idCategoria, 0)}>
+                                        <button className="text-xl" onClick={() => updateStatus(cat.idCategoria, 0)}>
                                             <i className="bi bi-check-lg text-green-600"></i>
                                         </button> :
-                                        <button className="text-3xl" onClick={() => updateStatus(cat.idCategoria, 1)}>
+                                        <button className="text-xl" onClick={() => updateStatus(cat.idCategoria, 1)}>
                                             <i className="bi bi-x text-red-600"></i>
                                         </button>
                                     }
                                     <button
-                                        className="border border-button2 p-2 rounded-md bg-cyan-500 text-white"
+                                        className="m-2 rounded-md text-white"
                                         title="editar"
                                         onClick={() => setAddAttribute({ idCategoria: cat.idCategoria, accion: "Actualizar ", attribute: "Categoria", value: cat.categoria })}
-                                    ><i className="bi bi-pencil-square"></i>
+                                    ><i className="bi bi-pencil-square text-cyan-500"></i>
                                     </button>
                                     <button
-                                        className="border border-button2 p-2 rounded-md bg-red-500 text-white"
+                                        className="m-1 rounded-md text-white"
                                         title="Vista previa"
                                     // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}  
                                     // disabled={!this.state.reset}
-                                    ><i className="bi bi-trash3-fill"></i>
+                                    ><i className="bi bi-trash3-fill text-red-500"></i>
                                     </button>
                                 </div>
                             </div>

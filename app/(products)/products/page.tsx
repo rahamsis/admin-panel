@@ -324,14 +324,14 @@ export default function Products() {
                                 <div className="flex items-center space-x-2">
                                     {prod.activo ? (
                                         <button
-                                            className="text-3xl"
+                                            className="text-xl"
                                             onClick={() => updateStatus(prod.idProducto, 0)}
                                         >
                                             <i className="bi bi-check-lg text-green-600"></i>
                                         </button>
                                     ) : (
                                         <button
-                                            className="text-3xl"
+                                            className="text-xl"
                                             onClick={() => updateStatus(prod.idProducto, 1)}
                                         >
                                             <i className="bi bi-x text-red-600"></i>
@@ -340,18 +340,18 @@ export default function Products() {
 
                                     <Link href={`/updateProduct/${prod.idProducto}`}>
                                         <button
-                                            className="border border-button2 p-2 rounded-md bg-cyan-500 text-white"
+                                            className="m-2 rounded-md text-white"
                                             title="Editar"
                                         >
-                                            <i className="bi bi-pencil-square"></i>
+                                            <i className="bi bi-pencil-square text-cyan-500"></i>
                                         </button>
                                     </Link>
 
                                     <button
-                                        className="border border-button2 p-2 rounded-md bg-red-500 text-white"
+                                        className="m-1 rounded-md text-white"
                                         title="Eliminar"
                                     >
-                                        <i className="bi bi-trash3-fill"></i>
+                                        <i className="bi bi-trash3-fill text-red-500"></i>
                                     </button>
                                 </div>
                             </div>

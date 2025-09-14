@@ -91,9 +91,9 @@ export default function UserMenu() {
 
 
       {isOpen && (
-        <div className={`absolute border ${deviceType === "PC" ? "right-0" : "-right-10"} mt-2 w-44 bg-white shadow-lg z-0`}>
+        <div className={`absolute border ${deviceType === "PC" ? "right-5" : "right-2"} mt-2 w-40 bg-white shadow-lg z-10`}>
           {/* nombre usuario */}
-          <div className="font-semibold text-2xl px-4 text-gray-600 border-b py-2">
+          <div className="font-semibold text-lg lg:text-2xl text-gray-600 border-b py-2 justify-between">
             {
               status === "authenticated" && session?.user?.name
                 ? session.user.name.charAt(0).toUpperCase() + session.user.name.slice(1)
@@ -101,9 +101,10 @@ export default function UserMenu() {
             }
           </div>
 
-          <Link href="/registro" className="block w-full px-4 py-2 text-sm md:text-base text-primary hover:text-white hover:bg-cyan-500 transition-all duration-200 ease-in-out">
+          <Link href="/registro" className="px-5 flex justify-between w-full py-2 text-sm md:text-base text-primary hover:text-white hover:bg-cyan-500 transition-all duration-200 ease-in-out">
             <i className="bi bi-gear-wide-connected mr-2"></i>Modificar perfil
           </Link>
+
           <div
             onClick={() => {
               signOut();
@@ -111,7 +112,7 @@ export default function UserMenu() {
               // router.push("/");
 
             }}
-            className="block px-4 w-full py-2 cursor-pointer text-sm md:text-base text-primary hover:text-white hover:bg-cyan-500 transition-all duration-200 ease-in-out"
+            className="px-5 flex justify-between w-full py-2 cursor-pointer text-sm md:text-base text-primary hover:text-white hover:bg-cyan-500 transition-all duration-200 ease-in-out"
           >
             <i className="bi bi-power mr-2"></i> Cerrar sesión
           </div>
