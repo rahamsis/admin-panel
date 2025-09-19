@@ -109,7 +109,7 @@ export default function Products() {
                     {/* Icono de limpiar */}
                     {showDeleteText && (
                         <i
-                            className="bi bi-x-lg absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-red-500"
+                            className="bi bi-x-lg absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
                             onClick={cleanInputSearch}
                         ></i>
                     )}

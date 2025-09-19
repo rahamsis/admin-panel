@@ -2,7 +2,7 @@
 
 /* eslint-disable */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type {
     Producto,
@@ -16,6 +16,7 @@ import { CirclePlus } from "lucide-react";
 import { useTenant } from "@/app/context/dataContext";
 import CustomSelect from "../select";
 import {
+    getAllProduct,
     getAllBrands,
     getAllCategories,
     getAllColors,
@@ -56,6 +57,12 @@ interface FotoPreview extends Fotos {
     file?: File; // opcional, solo para las nuevas imágenes que aún no están en la DB
 }
 
+const tipoProducto = [
+    { value: 0, label: 'Producto simple' },
+    { value: 1, label: 'Pack de productos' },
+    { value: 2, label: 'Producto virtual' },
+];
+
 export default function Product({ data }: ProductProps) {
     const { tenantId, userId } = useTenant();
     const router = useRouter();
@@ -63,6 +70,21 @@ export default function Product({ data }: ProductProps) {
     const [formData, setFormData] = useState<Producto>(data ?? defaultProduct);
 
     const [isLoading, setIsLoading] = useState(false);
+
+    const [cantidadProductPack, setCantidadProductPack] = useState<number | "">(1);
+    const [products, setProducts] = useState<Producto[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<Producto[]>([]);
+    const [inputValue, setInputValue] = useState("");
+    const [showDeleteText, setShowDeleteText] = useState(false);
+    const [isOpenProductLis, setIsOpenProductList] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Producto | null>(null);
+
+    const wrapperRef = useRef<HTMLDivElement>(null);
+
+    const cleanInputSearch = () => {
+        setInputValue('');
+        setShowDeleteText(false);
+    }
 
     const [categorias, setCategorias] = useState<Categoria[]>([]);
     const [subCategorias, setSubCategorias] = useState<SubCategoria[]>([]);
@@ -86,6 +108,9 @@ export default function Product({ data }: ProductProps) {
     const [alertNombre, setAlertNombre] = useState("");
     const [alertImagen, setAlertImagen] = useState("");
     const [alertCategoria, setAlertCategoria] = useState("");
+
+    const [isOpenTipoProducto, setIsOpenTipoProducto] = useState(false);
+    const [selectedTipoProducto, setSelectedTipoProducto] = useState(0);
 
     // sincronizar si cambia la prop data
     useEffect(() => {
@@ -111,20 +136,60 @@ export default function Product({ data }: ProductProps) {
         }
     }, [data]);
 
+    // Cerrar lista al hacer clic afuera
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+                setIsOpenProductList(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Filtrado
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setInputValue(value);
+        if (value === "") {
+            setFilteredProducts(products);
+        } else {
+            setFilteredProducts(
+                products.filter((p) =>
+                    p.nombre.toLowerCase().includes(value.toLowerCase())
+                )
+            );
+        }
+        setIsOpenProductList(true);
+        setSelectedProduct(null);
+    };
+
+    // Selección
+    const handleSelectProduct = (product: Producto) => {
+        setSelectedProduct(product);
+        setInputValue(product.nombre);
+        setIsOpenProductList(false);
+    };
+
     // sincronizar los dropdowns
     const setValuesToDropdowns = async () => {
         try {
-            const [categories, subCategories, brands, colors] = await Promise.all([
+            const [products, categories, subCategories, brands, colors] = await Promise.all([
+                getAllProduct(tenantId || ""),
                 getAllCategories(tenantId || ""),
                 getAllSubCategories(tenantId || ""),
                 getAllBrands(tenantId || ""),
                 getAllColors(tenantId || "")
             ]);
 
-            setCategorias([{ idCategoria: "0", categoria: "- Seleccione -" }, ...categories.filter((cat:Categoria) => Boolean(cat.activo))]);
-            setSubCategorias([{ idSubCategoria: "0", subCategoria: "- Seleccione -" }, ...subCategories.filter((scat:SubCategoria) => Boolean(scat.activo))]);
-            setMarcas([{ idMarca: "0", marca: "- Seleccione -" }, ...brands.filter((brd:Marca) => Boolean(brd.activo))]);
-            setColores([{ idColor: "0", color: "- Seleccione -" }, ...colors.filter((col:Color) => Boolean(col.activo))]);
+            setProducts(products);
+            setFilteredProducts(products);
+
+            // Agregar opción "- Seleccione -" al inicio y filtrar solo activos
+            setCategorias([{ idCategoria: "0", categoria: "- Seleccione -" }, ...categories.filter((cat: Categoria) => Boolean(cat.activo))]);
+            setSubCategorias([{ idSubCategoria: "0", subCategoria: "- Seleccione -" }, ...subCategories.filter((scat: SubCategoria) => Boolean(scat.activo))]);
+            setMarcas([{ idMarca: "0", marca: "- Seleccione -" }, ...brands.filter((brd: Marca) => Boolean(brd.activo))]);
+            setColores([{ idColor: "0", color: "- Seleccione -" }, ...colors.filter((col: Color) => Boolean(col.activo))]);
         } catch (error) {
             console.error("Error obteniendo categorias, subcategorias, marcas, colores", error);
         }
@@ -231,30 +296,139 @@ export default function Product({ data }: ProductProps) {
                     {data ? "Editar Producto" : "Agregar Producto"}
                 </h2>
 
-                <button
-                    onClick={handleSaveProduct}
-                    disabled={isLoading}
-                    className="hidden lg:block px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 cursor-pointer"
-                >
-                    {isLoading ? (
-                        <div className="flex items-center justify-center">
-                            <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l4-4-4-4v4a8 8 0 00-8 8H4z"></path>
-                            </svg>
-                            Cargando...
-                        </div>
-                    ) : (
-                        data ? "Actualizar Producto" : "Guardar Producto"
-                    )}
-                </button>
+                <div className="flex flex-col lg:flex-row gap-4">
+                    <div>
+                        <button
+                            className={`border border-zinc-300 px-4 py-2  cursor-pointer flex justify-between items-center ${data && "bg-gray-100 text-gray-500 cursor-not-allowed"}`}
+                            onClick={() => setIsOpenTipoProducto(!isOpenTipoProducto)}
+                            disabled={!!data}
+                        >
+                            <span>{tipoProducto.find(opt => opt.value === selectedTipoProducto)?.label}</span>
+                            <span className="ml-2">
+                                <i className="bi bi-chevron-down"></i>
+                            </span>
+                        </button>
+                        {isOpenTipoProducto && (
+                            <ul className="absolute z-10 mt-1 bg-white border border-zinc-300 shadow-lg max-h-60 overflow-auto">
+                                {tipoProducto.map(opt => (
+                                    <li
+                                        key={opt.value}
+                                        className={`px-4 py-2 cursor-pointer hover:bg-cyan-500 hover:text-white ${selectedTipoProducto === opt.value ? "text-zinc-800" : "text-zinc-500"
+                                            }`}
+                                        onClick={() => {
+                                            setSelectedTipoProducto(opt.value)
+                                            setIsOpenTipoProducto(false)
+                                        }}
+                                    >
+                                        {opt.label}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+
+
+                    <button
+                        onClick={handleSaveProduct}
+                        disabled={isLoading}
+                        className="hidden lg:block px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 cursor-pointer"
+                    >
+                        {isLoading ? (
+                            <div className="flex items-center justify-center">
+                                <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l4-4-4-4v4a8 8 0 00-8 8H4z"></path>
+                                </svg>
+                                Cargando...
+                            </div>
+                        ) : (
+                            data ? "Actualizar Producto" : "Guardar Producto"
+                        )}
+                    </button>
+                </div>
+
             </div>
 
-
             <div className="relative lg:flex w-full gap-6">
-                <div className="w-full lg:w-3/4 ">
+                <div className="w-full lg:w-3/4">
+                    <div className={`flex flex-col gap-2 pt-5 ${selectedTipoProducto != 1 && "hidden"}`}>
+                        <label className="font-semibold">
+                            Añadir productos al pack
+                        </label>
+                        <div className="flex flex-col lg:flex-row gap-4">
+                            <div className="relative w-full lg:w-3/5" ref={wrapperRef}>
+                                <div className="flex flex-row gap-4">
+                                    <input
+                                        placeholder="Buscar por nombre"
+                                        type="text"
+                                        value={inputValue}
+                                        onChange={(e) => {
+                                            setShowDeleteText(true);
+                                            handleInputChange(e)
+                                        }}
+                                        onFocus={() => setIsOpenProductList(true)}
+                                        className="w-full border p-2 focus:outline-none focus:border-cyan-500 focus:ring-cyan-500"
+                                    />
+
+                                    {/* Icono de limpiar */}
+                                    {showDeleteText && (
+                                        <i
+                                            className="bi bi-x-lg absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
+                                            onClick={cleanInputSearch}
+                                        ></i>
+                                    )}
+                                </div>
+
+                                {isOpenProductLis && filteredProducts.length > 0 && (
+                                    <ul className="absolute left-0 top-full w-full z-10 bg-white border border-zinc-300 shadow-lg max-h-60 overflow-auto">
+                                        {filteredProducts.map((prod) => (
+                                            <li
+                                                key={prod.idProducto}
+                                                className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-cyan-500 hover:text-white"
+                                                onClick={() => handleSelectProduct(prod)}
+                                            >
+                                                <img
+                                                    src={prod.fotos && prod.fotos.length > 0 ? prod.fotos[0].url_foto : "/no-image.png"}
+                                                    alt={prod.nombre}
+                                                    className="w-8 h-8 object-cover rounded"
+                                                />
+                                                <span>{prod.nombre}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+
+
+                            <div className="flex">
+                                <label className="border p-2 bg-gray-100">
+                                    <i className="bi bi-x text-gray-500"></i>
+                                </label>
+
+                                <input
+                                    type="number"
+                                    placeholder="Cantidad"
+                                    value={cantidadProductPack}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === "") {
+                                            setCantidadProductPack(""); // dejar vacío
+                                        } else {
+                                            setCantidadProductPack(parseInt(value, 10));
+                                        }
+                                    }}
+                                    className="w-full  border p-2 focus:outline-none focus:border-cyan-500 focus:ring-cyan-500">
+                                </input>
+                            </div>
+
+                            <button className="w-full lg:w-1/5 bg-cyan-500 text-white px-4 py-2 rounded-lg hover:bg-cyan-600">
+                                añadir
+                            </button>
+                        </div>
+                    </div>
+
                     {/* Imagenes y preview de imagenes */}
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 pt-4">
                         {/* Imagenes del producto */}
                         <label className="font-semibold">
                             Imagenes
