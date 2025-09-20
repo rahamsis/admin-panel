@@ -28,6 +28,7 @@ export async function getAllProduct(tenant: string) {
             marca: row.marca,
             nombre: row.nombre,
             precio: row.precio,
+            tipo: row.tipo,
             cantidad: row.cantidad,
             idColor: row.idColor,
             color: row.color,
@@ -36,7 +37,8 @@ export async function getAllProduct(tenant: string) {
             nuevo: row.nuevo,
             masVendido: row.masVendido,
             activo: row.activo,
-            fotos: row.fotos
+            fotos: row.fotos,
+            productospaquete: row.productospaquete
         }));
     } catch (error) {
         console.error('Error al obtener los productos destacados o nuevos o más vendidos:', error);
@@ -326,6 +328,7 @@ export async function getProductById(tenant: string, idProduct: string) {
             marca: row.marca,
             nombre: row.nombre,
             precio: row.precio,
+            tipo: row.tipo,
             cantidad: row.cantidad,
             idColor: row.idColor,
             color: row.color,
@@ -335,7 +338,8 @@ export async function getProductById(tenant: string, idProduct: string) {
             nuevo: row.nuevo,
             masVendido: row.masVendido,
             activo: row.activo,
-            fotos: row.fotos
+            fotos: row.fotos,
+            productospaquete: row.productospaquete 
         } as Producto;
     } catch (error) {
         console.error('Error al obtener los productos por ID:', error);

@@ -26,7 +26,7 @@ import {
 } from "@/lib/actions";
 import { ModalAddAttribute } from "../modales/crearAtributo";
 import { createRutaCloudinary } from "@/lib/util";
-
+import Image from "next/image";
 
 type ProductProps = {
     data: Producto | null;
@@ -42,6 +42,7 @@ const defaultProduct: Producto = {
     marca: "",
     nombre: "",
     precio: 0,
+    tipo: 1,
     idColor: "0",
     color: "",
     descripcion: "",
@@ -50,11 +51,21 @@ const defaultProduct: Producto = {
     masVendido: false,
     activo: true,
     cantidad: 0,
-    fotos: []
+    fotos: [],
+    productospaquete: []
 }
 
 interface FotoPreview extends Fotos {
     file?: File; // opcional, solo para las nuevas imágenes que aún no están en la DB
+}
+
+interface ProductPackItem {
+    idProductoPaquete?: string;
+    idPaquete?: string;
+    idProduct: string;
+    nombre: string;
+    imagen: string;
+    quantity: number;
 }
 
 const tipoProducto = [
@@ -72,6 +83,8 @@ export default function Product({ data }: ProductProps) {
     const [isLoading, setIsLoading] = useState(false);
 
     const [cantidadProductPack, setCantidadProductPack] = useState<number | "">(1);
+    const [packItemsFromDb, setPackItemsFromDb] = useState<ProductPackItem[]>([]);
+    const [packItems, setPackItems] = useState<ProductPackItem[]>([])
     const [products, setProducts] = useState<Producto[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Producto[]>([]);
     const [inputValue, setInputValue] = useState("");
@@ -79,12 +92,8 @@ export default function Product({ data }: ProductProps) {
     const [isOpenProductLis, setIsOpenProductList] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Producto | null>(null);
 
-    const wrapperRef = useRef<HTMLDivElement>(null);
-
-    const cleanInputSearch = () => {
-        setInputValue('');
-        setShowDeleteText(false);
-    }
+    const wrapperRefInputProductList = useRef<HTMLDivElement>(null);
+    const wrapperRefSelectProductType = useRef<HTMLDivElement>(null);
 
     const [categorias, setCategorias] = useState<Categoria[]>([]);
     const [subCategorias, setSubCategorias] = useState<SubCategoria[]>([]);
@@ -109,6 +118,9 @@ export default function Product({ data }: ProductProps) {
     const [alertImagen, setAlertImagen] = useState("");
     const [alertCategoria, setAlertCategoria] = useState("");
 
+    const [alertProductPack, setAlertProductPack] = useState("");
+    const [alertCantidadProductPack, setAlertCantidadProductPack] = useState("");
+
     const [isOpenTipoProducto, setIsOpenTipoProducto] = useState(false);
     const [selectedTipoProducto, setSelectedTipoProducto] = useState(0);
 
@@ -116,6 +128,7 @@ export default function Product({ data }: ProductProps) {
     useEffect(() => {
         if (data) {
             setFormData(data);
+            setSelectedTipoProducto(data.tipo)
             setCategoriaSeleccionada(data.idCategoria);
             setSubCategoriaSeleccionada(data.idSubCategoria);
             setMarcaSeleccionada(data.idMarca);
@@ -136,16 +149,50 @@ export default function Product({ data }: ProductProps) {
         }
     }, [data]);
 
-    // Cerrar lista al hacer clic afuera
+    //sincronizar los packs de productos si hubieran
+    useEffect(() => {
+        if (data?.productospaquete && Array.isArray(data.productospaquete)) {
+            // Mapear cada item que viene del backend a tu interfaz ProductPackItem
+            const items: ProductPackItem[] = data.productospaquete.map((item: any) => ({
+                idProductoPaquete: item.idProductoPaquete,
+                idPaquete: item.idPaquete,
+                idProduct: item.idProducto,
+                nombre: item.nombre ?? "",      // si no viene el nombre, poner string vacío
+                imagen: item.imagen ?? "",      // si no viene la imagen, poner string vacío
+                quantity: item.cantidad ?? 0,   // si no viene cantidad, poner 0
+            }));
+
+            setPackItemsFromDb(items);
+            setPackItems(items);
+        } else {
+            // Si no viene nada, aseguramos array vacío
+            setPackItemsFromDb([]);
+        }
+    }, [data]);
+
+    // Cerrar al hacer clic fuera de ambos
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+            if (
+                wrapperRefInputProductList.current &&
+                !wrapperRefInputProductList.current.contains(event.target as Node) &&
+                wrapperRefSelectProductType.current &&
+                !wrapperRefSelectProductType.current.contains(event.target as Node)
+            ) {
                 setIsOpenProductList(false);
+                setIsOpenTipoProducto(false);
             }
         };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
     }, []);
+
+    //Limpiar input de busqueda de producto
+    const cleanInputSearch = () => {
+        setInputValue('');
+        setShowDeleteText(false);
+    }
 
     // Filtrado
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -169,6 +216,7 @@ export default function Product({ data }: ProductProps) {
         setSelectedProduct(product);
         setInputValue(product.nombre);
         setIsOpenProductList(false);
+        setAlertProductPack("");
     };
 
     // sincronizar los dropdowns
@@ -222,7 +270,26 @@ export default function Product({ data }: ProductProps) {
         }
     };
 
+    const handleRemoveItemPack = (indexToRemove: number) => {
+        // setPackItemsFromDb(prev => prev.filter((_, index) => index !== indexToRemove));
+        const newItems = [...packItems];
+        newItems.splice(indexToRemove, 1);
+        setPackItems(newItems);
+    };
+
     const handleSaveProduct = async () => {
+        if (selectedTipoProducto === 0) {
+            setSelectedProduct(null);
+            setInputValue("");
+            setCantidadProductPack(1);
+        }
+
+        if (selectedTipoProducto === 1 && packItems.length < 1) {
+            console.log()
+            setAlertProductPack("Añada al menos dos producto al pack");
+            return;
+        }
+
         if (preview.length === 0) {
             setAlertImagen("Ingrese al menos una imagen para el producto");
             return;
@@ -272,6 +339,57 @@ export default function Product({ data }: ProductProps) {
                 nombreColorSeleccionada)
         ))
 
+        // Items a eliminar (estaban antes pero ya no están)
+        const toRemove = packItemsFromDb.filter(
+            (o) => !packItems.some((p) => p.idProduct === o.idProduct)
+        );
+
+        // Items a agregar (no estaban antes y ahora sí están)
+        const toAdd = packItems.filter(
+            (p) => !packItemsFromDb.some((o) => o.idProduct === p.idProduct)
+        );
+
+        // Items a actualizar (mismo producto, pero cantidad distinta)
+        const toUpdate = packItems
+            .filter((p) =>
+                packItemsFromDb.some(
+                    (dbItem) =>
+                        dbItem.idProduct === p.idProduct && dbItem.quantity !== p.quantity
+                )
+            )
+            // Mezclamos con los datos de BD para traer idProductoPaquete e idPaquete
+            .map((p) => {
+                const dbItem = packItemsFromDb.find((db) => db.idProduct === p.idProduct);
+                return {
+                    ...p,
+                    idProductoPaquete: dbItem?.idProductoPaquete,
+                    idPaquete: dbItem?.idPaquete,
+                };
+            });
+
+        fd.append("tipo", String(selectedTipoProducto));
+        if (selectedTipoProducto === 1 && packItems.length > 0) {
+            // fd.append("packItemsToAdd", JSON.stringify(packItemsFromDb.map(item => ({
+            //     idProducto: item.idProduct,
+            //     cantidad: item.quantity
+            // }))));
+            fd.append("packItemsToAdd", JSON.stringify(toAdd.map(item => ({
+                idProducto: item.idProduct,
+                cantidad: item.quantity
+            }))));
+            fd.append("packItemsToRemove", JSON.stringify(toRemove.map(item => ({
+                idProductoPaquete: item.idProductoPaquete,
+                idPaquete: item.idPaquete,
+            }))));
+            fd.append("packItemsToUpdate", JSON.stringify(toUpdate.map(item => ({
+                idProductoPaquete: item.idProductoPaquete,
+                idPaquete: item.idPaquete,
+                idProducto: item.idProduct,
+                cantidad: item.quantity
+            }))));
+        }
+
+        // console.log("datos a enviar:", Object.fromEntries(fd.entries()));
         const res = formData.idProducto
             ? await updateProduct(tenantId || "", fd)
             : await saveProduct(tenantId || "", fd);
@@ -289,6 +407,37 @@ export default function Product({ data }: ProductProps) {
         }
     }
 
+    const addProductToPack = (selectedProduct: Producto | null, cntdProd: number | "") => {
+        if (!selectedProduct) {
+            setAlertProductPack("Seleccione un producto para añadir al pack")
+            return
+        };
+
+        if (cantidadProductPack == "" || cantidadProductPack <= 0) {
+            setAlertCantidadProductPack("Ingrese una cantidad válida")
+            return
+        };
+
+        // Verificar si el producto ya está en el pack
+        const exists = packItems.find(item => item.idProduct === selectedProduct.idProducto);
+        if (exists) {
+            setAlertProductPack("El producto ya está en el pack")
+            return;
+        }
+
+        setPackItems(prev => [...prev, {
+            idProduct: selectedProduct.idProducto,
+            nombre: selectedProduct.nombre,
+            imagen: selectedProduct.fotos[0].url_foto,
+            quantity: cntdProd as number
+        }]);
+
+        // Limpiar selección
+        setSelectedProduct(null);
+        setInputValue("");
+        setCantidadProductPack(1);
+    }
+
     return (
         <div className="bg-white p-6 lg:rounded-xl shadow">
             <div className="flex justify-between flex-row">
@@ -297,10 +446,14 @@ export default function Product({ data }: ProductProps) {
                 </h2>
 
                 <div className="flex flex-col lg:flex-row gap-4">
-                    <div>
+                    <div className="relative" ref={wrapperRefSelectProductType}>
                         <button
-                            className={`border border-zinc-300 px-4 py-2  cursor-pointer flex justify-between items-center ${data && "bg-gray-100 text-gray-500 cursor-not-allowed"}`}
-                            onClick={() => setIsOpenTipoProducto(!isOpenTipoProducto)}
+                            className={`border border-zinc-300 px-4 py-2  cursor-pointer flex justify-between items-center 
+                                ${data && "bg-gray-100 text-gray-500 cursor-not-allowed"}`}
+                            onClick={() => {
+                                setIsOpenTipoProducto(!isOpenTipoProducto)
+                                setIsOpenProductList(false);
+                            }}
                             disabled={!!data}
                         >
                             <span>{tipoProducto.find(opt => opt.value === selectedTipoProducto)?.label}</span>
@@ -309,7 +462,7 @@ export default function Product({ data }: ProductProps) {
                             </span>
                         </button>
                         {isOpenTipoProducto && (
-                            <ul className="absolute z-10 mt-1 bg-white border border-zinc-300 shadow-lg max-h-60 overflow-auto">
+                            <ul className="absolute z-10 mt-1 w-full bg-white border border-zinc-300 shadow-lg max-h-60 overflow-auto">
                                 {tipoProducto.map(opt => (
                                     <li
                                         key={opt.value}
@@ -355,28 +508,72 @@ export default function Product({ data }: ProductProps) {
                         <label className="font-semibold">
                             Añadir productos al pack
                         </label>
+
+                        {packItems.length > 0 && (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {packItems.map((item, index) => (
+                                    <div key={index} className="w-32 justify-between border flex flex-col p-2 mb-2 space-y-4">
+                                        <div>
+                                            <div className="relative">
+                                                <button
+                                                    onClick={() => handleRemoveItemPack(index)}
+                                                    className="absolute w-5 h-5 -top-1 -right-1 flex items-center justify-center bg-red-600 text-white rounded-full p-1"
+                                                >
+                                                    <i className="bi bi-x"></i>
+                                                </button>
+
+                                                <Image
+                                                    alt={item.nombre}
+                                                    src={item.imagen}
+                                                    width={500}
+                                                    height={500}
+                                                    className="object-cover"
+                                                    priority={true} />
+                                            </div>
+
+                                            <div className="pt-2">
+                                                <p className="text-base">{item.nombre}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Cantidad abajo a la derecha */}
+                                        <div className="flex justify-end">
+                                            <p className="text-sm">x {item.quantity}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <div className="flex flex-col lg:flex-row gap-4">
-                            <div className="relative w-full lg:w-3/5" ref={wrapperRef}>
-                                <div className="flex flex-row gap-4">
+                            {/* Input de búsqueda */}
+                            <div className="relative w-full lg:w-3/5" ref={wrapperRefInputProductList}>
+                                {/* <div className="flex flex-row gap-4"> */}
+                                <div className="relative">
                                     <input
                                         placeholder="Buscar por nombre"
                                         type="text"
                                         value={inputValue}
                                         onChange={(e) => {
                                             setShowDeleteText(true);
-                                            handleInputChange(e)
+                                            handleInputChange(e);
+                                            setAlertProductPack("");
                                         }}
-                                        onFocus={() => setIsOpenProductList(true)}
+                                        onFocus={() => {
+                                            setIsOpenProductList(true)
+                                            setIsOpenTipoProducto(false);
+                                        }}
                                         className="w-full border p-2 focus:outline-none focus:border-cyan-500 focus:ring-cyan-500"
                                     />
 
                                     {/* Icono de limpiar */}
-                                    {showDeleteText && (
+                                    {(showDeleteText && inputValue != "") && (
                                         <i
                                             className="bi bi-x-lg absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
                                             onClick={cleanInputSearch}
                                         ></i>
                                     )}
+
                                 </div>
 
                                 {isOpenProductLis && filteredProducts.length > 0 && (
@@ -397,32 +594,46 @@ export default function Product({ data }: ProductProps) {
                                         ))}
                                     </ul>
                                 )}
+
+                                {alertProductPack && (
+                                    <p className="mt-1 text-red-500 text-xs">{alertProductPack}</p>
+                                )}
                             </div>
 
 
-                            <div className="flex">
-                                <label className="border p-2 bg-gray-100">
-                                    <i className="bi bi-x text-gray-500"></i>
-                                </label>
+                            {/* <div className="flex "> */}
+                            <div className="flex flex-col w-full lg:w-auto">
+                                <div className="flex">
+                                    <label className="border p-2 bg-gray-100">
+                                        <i className="bi bi-x text-gray-500"></i>
+                                    </label>
 
-                                <input
-                                    type="number"
-                                    placeholder="Cantidad"
-                                    value={cantidadProductPack}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (value === "") {
-                                            setCantidadProductPack(""); // dejar vacío
-                                        } else {
-                                            setCantidadProductPack(parseInt(value, 10));
-                                        }
-                                    }}
-                                    className="w-full  border p-2 focus:outline-none focus:border-cyan-500 focus:ring-cyan-500">
-                                </input>
+                                    <input
+                                        type="number"
+                                        placeholder="Cantidad"
+                                        value={cantidadProductPack}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value === "") {
+                                                setCantidadProductPack(""); // dejar vacío
+                                                setAlertCantidadProductPack("");
+                                            } else {
+                                                setCantidadProductPack(parseInt(value, 10));
+                                                setAlertCantidadProductPack("");
+                                            }
+                                        }}
+                                        className="w-full  border p-2 focus:outline-none focus:border-cyan-500 focus:ring-cyan-500">
+                                    </input>
+                                </div>
+                                {alertCantidadProductPack && (
+                                    <p className="mt-1 text-red-500 text-xs">{alertCantidadProductPack}</p>
+                                )}
                             </div>
 
-                            <button className="w-full lg:w-1/5 bg-cyan-500 text-white px-4 py-2 rounded-lg hover:bg-cyan-600">
-                                añadir
+                            <button
+                                className="w-full lg:w-1/5 self-start bg-cyan-500 text-white px-4 py-2 rounded-lg hover:bg-cyan-600"
+                                onClick={() => addProductToPack(selectedProduct, cantidadProductPack)}>
+                                <i className="bi bi-plus-lg"></i> añadir
                             </button>
                         </div>
                     </div>
@@ -445,7 +656,7 @@ export default function Product({ data }: ProductProps) {
                             />
 
                             {/* Cuadrícula de previews */}
-                            <div className="flex lg:flex-row flex-col gap-4 border p-3">
+                            <div className="flex lg:flex-row flex-row gap-4 border p-3">
                                 {/* Botón cuadrado para seleccionar */}
                                 {(preview.length) < 3 && (
                                     <label
@@ -631,8 +842,8 @@ export default function Product({ data }: ProductProps) {
                                     }} />
                             </div>
 
-                            <div className="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4">
-                                <div className="flex flex-col gap-2">
+                            <div className="grid grid-cols-1 gap-4">
+                                <div className="grid grid-cols-2 gap-2">
                                     <label className="font-semibold text-sm">
                                         Destacado
                                     </label>
@@ -648,7 +859,7 @@ export default function Product({ data }: ProductProps) {
                                     </button>
                                 </div>
 
-                                <div className="flex flex-col gap-2">
+                                <div className="grid grid-cols-2 gap-2">
                                     <label className="font-semibold text-xs lg:text-sm">
                                         Nuevo
                                     </label>
@@ -664,7 +875,7 @@ export default function Product({ data }: ProductProps) {
                                     </button>
                                 </div>
 
-                                <div className="flex flex-col gap-2">
+                                <div className="grid grid-cols-2 gap-2">
                                     <label className="font-semibold text-xs lg:text-sm">
                                         Más Vendido
                                     </label>
@@ -680,7 +891,7 @@ export default function Product({ data }: ProductProps) {
                                     </button>
                                 </div>
 
-                                <div className="flex flex-col gap-2">
+                                <div className="grid grid-cols-2 gap-2">
                                     <label className="font-semibold text-xs lg:text-sm">
                                         Activo
                                     </label>

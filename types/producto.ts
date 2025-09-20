@@ -8,6 +8,7 @@ export interface Producto {
     marca: string;
     nombre: string;
     precio: number;
+    tipo: number;
     cantidad: number;
     idColor: string;
     color: string;
@@ -17,6 +18,7 @@ export interface Producto {
     masVendido: boolean;
     activo: boolean;
     fotos: Fotos[];
+    productospaquete: ProductosPaquete[]
 }
 
 export interface Fotos {
@@ -24,6 +26,13 @@ export interface Fotos {
     url_foto: string;
     rutaCloudinary: string;
     isPrincipal: boolean;
+}
+
+export interface ProductosPaquete {
+    idProductoPaquete: string;
+    idPaquete: string;
+    idProducto: string;
+    cantidad: number;
 }
 
 export interface Categoria {

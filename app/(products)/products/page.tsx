@@ -41,6 +41,7 @@ export default function Products() {
             try {
                 setIsLoading(true);
                 const data = await getAllProduct(tenantId || "");
+                console.log(data)
                 setProducts(data);
             } catch (error) {
                 console.error("Error obteniendo los productos", error);
@@ -204,7 +205,7 @@ export default function Products() {
                                             <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{prod.nombre}</td>
                                             <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{prod.categoria}</td>
                                             <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{prod.precio}</td>
-                                            <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{3}</td>
+                                            <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{prod.cantidad}</td>
                                             <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{
                                                 prod.activo ?
                                                     <button className="text-3xl" onClick={() => updateStatus(prod.idProducto, 0)}>
