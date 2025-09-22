@@ -16,7 +16,6 @@ export default function UpdateProduct() {
     useEffect(() => {
         async function fetchData() {
             const data = await getProductById(tenantId || "", idProduct as string);
-            console.log("data: ", data)
             setProduct(data);
         }
 

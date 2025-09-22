@@ -1,5 +1,6 @@
 'use server';
 
+import { Menu } from "@/types/menu";
 import { Producto } from "@/types/producto";
 
 /* eslint-disable */
@@ -88,6 +89,8 @@ export async function getAllSubCategories(tenant: string) {
         return data.map((row: any) => ({
             idSubCategoria: row.idSubCategoria,
             subCategoria: row.subCategoria,
+            idCategoria: row.idCategoria,
+            categoria: row.categoria,
             activo: row.activo
         }));
     } catch (error) {
@@ -234,7 +237,7 @@ export async function saveOrUpdateCategories(tenant: string, userId: string, idC
     }
 }
 
-export async function saveOrUpdateSubCategories(tenant: string, userId: string, subCategoria: string) {
+export async function saveOrUpdateSubCategories(tenant: string, userId: string, idSubCategoria: string, subCategoria: string, idCategoria: string) {
     try {
         const response = await fetch(`${process.env.APP_BACK_END}/update-or-save-subcategorie`, {
             method: 'POST',
@@ -243,7 +246,7 @@ export async function saveOrUpdateSubCategories(tenant: string, userId: string, 
                 "X-Tenant-ID": tenant,
                 'accept': '/'
             },
-            body: JSON.stringify({ userId, subCategoria }),
+            body: JSON.stringify({ userId, idSubCategoria, subCategoria, idCategoria }),
             next: { revalidate: 0 }
         });
 
@@ -257,7 +260,30 @@ export async function saveOrUpdateSubCategories(tenant: string, userId: string, 
     }
 }
 
-export async function saveOrUpdateMarca(tenant: string, userId: string, marca: string) {
+export async function deleteSubCategorie(tenant: string, idSubCategoria: string) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/delete-subcategorie`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: JSON.stringify({ idSubCategoria }),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+
+        return data;
+
+    } catch (error) {
+        console.error('Error al eliminar la subcategoria:', error);
+        throw new Error("Error al eliminar la subcategoria");
+    }
+}
+
+export async function saveOrUpdateMarca(tenant: string, userId: string, idmarca: string, marca: string) {
     try {
         const response = await fetch(`${process.env.APP_BACK_END}/update-or-save-marca`, {
             method: 'POST',
@@ -266,7 +292,7 @@ export async function saveOrUpdateMarca(tenant: string, userId: string, marca: s
                 "X-Tenant-ID": tenant,
                 'accept': '/'
             },
-            body: JSON.stringify({ userId, marca }),
+            body: JSON.stringify({ userId, idmarca, marca }),
             next: { revalidate: 0 }
         });
 
@@ -280,7 +306,7 @@ export async function saveOrUpdateMarca(tenant: string, userId: string, marca: s
     }
 }
 
-export async function saveOrUpdateColor(tenant: string, userId: string, color: string) {
+export async function saveOrUpdateColor(tenant: string, userId: string, idColor: string, color: string) {
     try {
         const response = await fetch(`${process.env.APP_BACK_END}/update-or-save-color`, {
             method: 'POST',
@@ -289,7 +315,7 @@ export async function saveOrUpdateColor(tenant: string, userId: string, color: s
                 "X-Tenant-ID": tenant,
                 'accept': '/'
             },
-            body: JSON.stringify({ userId, color }),
+            body: JSON.stringify({ userId, idColor, color }),
             next: { revalidate: 0 }
         });
 
@@ -317,7 +343,7 @@ export async function getProductById(tenant: string, idProduct: string) {
 
         const data = await response.json();
         const row = data[0];
-        
+
         return {
             idProducto: row.idProducto,
             idCategoria: row.idCategoria,
@@ -339,7 +365,7 @@ export async function getProductById(tenant: string, idProduct: string) {
             masVendido: row.masVendido,
             activo: row.activo,
             fotos: row.fotos,
-            productospaquete: row.productospaquete 
+            productospaquete: row.productospaquete
         } as Producto;
     } catch (error) {
         console.error('Error al obtener los productos por ID:', error);
@@ -428,5 +454,75 @@ export async function updateStatusColor(tenant: string, idColor: string, status:
     } catch (error) {
         console.error("Error al actualizar el estado del color", error);
         throw new Error("Error al actualizar el estado del color")
+    }
+}
+
+export async function getMenus(tenant: string) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/backendApi/menus`, {
+            method: 'GET',
+            cache: "no-store", // evita cache estático de Next.js
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+        });
+
+        const data = await response.json();
+
+        return data.menus.map((item: Menu) => ({
+            idMenu: String(item.idMenu),
+            urlMenu: String(item.urlMenu),
+            titulo: String(item.titulo),
+            idCategoria: String(item.idCategoria),
+            userId: String(item.userId),
+            orden: Number(item.orden),
+            estado: Boolean(item.estado),
+            subMenu: item.subMenu ? item.subMenu.split(",") : [],
+        }));
+        // const menus: Menu[] = data.menus.map((item: any) => ({
+        //     idMenu: String(item.idMenu),
+        //     urlMenu: String(item.urlMenu),
+        //     titulo: String(item.titulo),
+        //     idCategoria: String(item.idCategoria),
+        //     userId: String(item.userId),
+        //     orden: Number(item.orden),
+        //     estado: Boolean(item.estado),
+        //     subMenu: item.subMenu ? item.subMenu.split(",") : [],
+        // }));
+
+        // const categorias: Categoria[] = data.categorias.map((item: any) => ({
+        //     idCategoria: String(item.idCategoria),
+        //     categoria: String(item.categoria),
+        //     activo: Boolean(item.activo),
+        //     subMenu: item.subMenu ? item.subMenu.split(",") : [],
+        // }));
+
+        // return { menus, categorias };
+    } catch (error) {
+        console.error('Error cargando menús:', error);
+        throw new Error("Error cargando menús");
+    }
+}
+
+export async function saveMenu(tenant: string, body: Menu[]) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/save-menu`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                "accept": "application/json"
+            },
+            body: JSON.stringify(body),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error al guardar el menu", error);
+        throw new Error("Error al guardar el menu")
     }
 }

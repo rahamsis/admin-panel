@@ -4,7 +4,6 @@
 
 import { useEffect, useState } from "react";
 import { getAllCategories, updateStatusCategorie, } from "@/lib/actions";
-import Link from "next/link";
 import { useTenant } from "@/app/context/dataContext";
 import type { Categoria } from "@/types/producto";
 import { ModalAddAttribute } from "@/components/modales/crearAtributo";
@@ -299,7 +298,7 @@ export default function Categories() {
 
             {addAtribute && (
                 <ModalAddAttribute
-                    idcategoria={addAtribute.idCategoria}
+                    idAttribute={addAtribute.idCategoria}
                     accion={addAtribute.accion}
                     attribute={addAtribute.attribute}
                     value={addAtribute.value}

@@ -207,7 +207,7 @@ export default function Brands() {
                                                 <button
                                                     className="border border-button2 p-2 rounded-md bg-green-500 text-white"
                                                     title="editar"
-                                                    onClick={() => setAddAttribute({ idMarca: mar.idMarca, accion: "Actualizar ", attribute: "Categoria", value: mar.marca })}
+                                                    onClick={() => setAddAttribute({ idMarca: mar.idMarca, accion: "Actualizar ", attribute: "Marca", value: mar.marca })}
                                                 ><i className="bi bi-pencil-square"></i>
                                                 </button>
 
@@ -300,7 +300,7 @@ export default function Brands() {
 
             {addAtribute && (
                 <ModalAddAttribute
-                    idcategoria={addAtribute.idMarca}
+                    idAttribute={addAtribute.idMarca}
                     accion={addAtribute.accion}
                     attribute={addAtribute.attribute}
                     value={addAtribute.value}

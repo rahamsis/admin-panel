@@ -285,7 +285,6 @@ export default function Product({ data }: ProductProps) {
         }
 
         if (selectedTipoProducto === 1 && packItems.length < 1) {
-            console.log()
             setAlertProductPack("Añada al menos dos producto al pack");
             return;
         }
@@ -326,17 +325,11 @@ export default function Product({ data }: ProductProps) {
         fd.append("fotoDeleted", JSON.stringify(fotoDeleted));
         fd.append("rutaCloudinary", String(
             createRutaCloudinary(tenantId || "",
-                formData.categoria,
-                formData.subCategoria,
-                formData.marca,
-                formData.color)
+                formData.categoria)
         ))
         fd.append("nuevaRutaCloudinary", String(
             createRutaCloudinary(tenantId || "",
-                nombreCategoriaSeleccionada,
-                nombreSubCategoriaSeleccionada,
-                nombreMarcaSeleccionada,
-                nombreColorSeleccionada)
+                nombreCategoriaSeleccionada)
         ))
 
         // Items a eliminar (estaban antes pero ya no están)
@@ -388,7 +381,7 @@ export default function Product({ data }: ProductProps) {
                 cantidad: item.quantity
             }))));
         }
-
+        
         // console.log("datos a enviar:", Object.fromEntries(fd.entries()));
         const res = formData.idProducto
             ? await updateProduct(tenantId || "", fd)

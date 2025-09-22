@@ -125,7 +125,7 @@ export default function Colors() {
                 </div>
 
                 {/* Botón de agregar usuario */}
-                <div className='hidden lg:flex lg:flex-row border'>
+                <div className='hidden lg:flex lg:flex-row'>
                     <button
                         className='bg-cyan-500 text-white px-4 py-2 rounded flex flex-row' onClick={() => setAddAttribute({ idColor: "", accion: "Crear ", attribute: "Color", value: "" })}>
                         <i className="bi bi-plus-circle mr-2"></i>
@@ -207,7 +207,7 @@ export default function Colors() {
                                                 <button
                                                     className="border border-button2 p-2 rounded-md bg-green-500 text-white"
                                                     title="editar"
-                                                    onClick={() => setAddAttribute({ idColor: col.idColor, accion: "Actualizar ", attribute: "Categoria", value: col.color })}
+                                                    onClick={() => setAddAttribute({ idColor: col.idColor, accion: "Actualizar ", attribute: "Color", value: col.color })}
                                                 ><i className="bi bi-pencil-square"></i>
                                                 </button>
 
@@ -300,7 +300,7 @@ export default function Colors() {
 
             {addAtribute && (
                 <ModalAddAttribute
-                    idcategoria={addAtribute.idColor}
+                    idAttribute={addAtribute.idColor}
                     accion={addAtribute.accion}
                     attribute={addAtribute.attribute}
                     value={addAtribute.value}

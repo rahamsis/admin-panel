@@ -281,6 +281,7 @@ const Sidebar = () => {
               { href: "/sub-categories", icon: "bi-hdd-stack-fill", label: "SubCategorias" },
               { href: "/brands", icon: "bi-handbag-fill", label: "Marcas" },
               { href: "/colors", icon: "bi-palette-fill", label: "Colores" },
+              { href: "/menu", icon: "bi bi-menu-button-wide-fill", label: "Menu" },
             ].map((item) => (
               <Link
                 key={item.href}

@@ -44,6 +44,8 @@ export interface Categoria {
 export interface SubCategoria {
     idSubCategoria: string;
     subCategoria: string;
+    idCategoria?: string;
+    categoria?: string;
     activo: boolean;
 }
 

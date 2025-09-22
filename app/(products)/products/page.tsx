@@ -41,7 +41,6 @@ export default function Products() {
             try {
                 setIsLoading(true);
                 const data = await getAllProduct(tenantId || "");
-                console.log(data)
                 setProducts(data);
             } catch (error) {
                 console.error("Error obteniendo los productos", error);
@@ -218,21 +217,21 @@ export default function Products() {
                                             <td className="border border-gray-300 space-x-1 text-center ">
                                                 <Link href={`/updateProduct/${prod.idProducto}`}>
                                                     <button
-                                                        className="border border-button2 p-2 rounded-md bg-green-500 text-white"
+                                                        className="border border-green-500 p-2 rounded-md text-green-500 hover:bg-green-500 hover:text-white"
                                                         title="editar"
                                                     ><i className="bi bi-pencil-square"></i>
                                                     </button>
                                                 </Link>
 
                                                 <button
-                                                    className="border border-button2 p-2 rounded-md bg-blue-500 text-white"
+                                                    className="border border-blue-500 p-2 rounded-md text-blue-500 hover:bg-blue-500 hover:text-white"
                                                     title="Vista previa"
                                                 // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}
                                                 // disabled={!this.state.reset}
                                                 ><i className="bi bi-eye-fill"></i>
                                                 </button>
                                                 <button
-                                                    className="border border-button2 p-2 rounded-md bg-red-500 text-white"
+                                                    className="border border-red-500 p-2 rounded-md text-red-500 hover:bg-red-500 hover:text-white"
                                                     title="Vista previa"
                                                 // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}
                                                 // disabled={!this.state.reset}

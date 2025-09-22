@@ -1,5 +1,5 @@
-export function createRutaCloudinary(tenant: string, categoria: string, subCategoria: string, marca: string, color: string) {
-    return [tenant, categoria, subCategoria, marca, color]
+export function createRutaCloudinary(tenant: string, categoria: string) {
+    return [tenant, categoria.toLowerCase()]
         .filter(Boolean)
         .join("/") + "/";
 }

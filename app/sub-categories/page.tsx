@@ -3,16 +3,18 @@
 /* eslint-disable */
 
 import { useEffect, useState } from "react";
-import { getAllSubCategories, updateStatusSubCategorie, } from "@/lib/actions";
+import { deleteSubCategorie, getAllCategories, getAllSubCategories, updateStatusSubCategorie, } from "@/lib/actions";
 import Link from "next/link";
 import { useTenant } from "@/app/context/dataContext";
-import type { SubCategoria } from "@/types/producto";
+import { Categoria, type SubCategoria } from "@/types/producto";
 import { ModalAddAttribute } from "@/components/modales/crearAtributo";
+import { ModalAlert } from "@/components/modales/alert";
 
 export default function SubCategories() {
     const { tenantId } = useTenant();
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [categorias, setCategorias] = useState<Categoria[]>([]);
     const [subcategories, setSubCategories] = useState<SubCategoria[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -33,8 +35,9 @@ export default function SubCategories() {
     const [showDeleteText, setShowDeleteText] = useState(false);
 
     const [addAtribute, setAddAttribute] = useState<{ idSubCategoria: string, accion: string, attribute: string, value: string } | null>(null)
+    const [deleteAttribute, setDeleteAttribute] = useState< string | null>(null)
 
-    // llenar los productos
+    // llenar las subcategorias
     useEffect(() => {
 
         async function fetchData() {
@@ -48,6 +51,21 @@ export default function SubCategories() {
                 console.error("Error obteniendo las sub categorias:", error);
             } finally {
                 setIsLoading(false);
+            }
+        }
+
+        fetchData();
+    }, []);
+
+    // llenar las categorias
+    useEffect(() => {
+
+        async function fetchData() {
+            try {
+                const data = await getAllCategories(tenantId || "");
+                setCategorias([{ idCategoria: "0", categoria: "- Seleccione -" }, ...data.filter((cat: Categoria) => Boolean(cat.activo))]);
+            } catch (error) {
+                console.error("Error obteniendo las categorias en el módulo de sub categorias:", error);
             }
         }
 
@@ -93,6 +111,18 @@ export default function SubCategories() {
         setSubCategories(updatedSubCategories);
     }
 
+    const deleteSubCategoria = async (idSubCategoria: string) => {
+        const result = await deleteSubCategorie(tenantId || "", idSubCategoria);
+
+        if (result.result?.affectedRows) {
+            // 👇 recargar todas las sub categorías
+            const updatedSubCategories = await getAllSubCategories(tenantId || "");
+            setSubCategories(updatedSubCategories);
+        } else {
+            setDeleteAttribute(result.message)
+        }
+    }
+
     return (
         <div className="bg-white p-6 lg:rounded-xl shadow min-h-screen">
             <h2 className="text-xl font-semibold mb-4">SubCategorias</h2>
@@ -124,7 +154,7 @@ export default function SubCategories() {
                     )}
                 </div>
 
-                {/* Botón de agregar usuario */}
+                {/* Botón de agregar sub categoria */}
                 <div className='hidden lg:flex lg:flex-row border'>
                     <button className='bg-cyan-500 text-white px-4 py-2 rounded flex flex-row' onClick={() => setAddAttribute({ idSubCategoria: "", accion: "Crear ", attribute: "Sub Categoria", value: "" })}>
                         <i className="bi bi-plus-circle mr-2"></i>
@@ -147,6 +177,7 @@ export default function SubCategories() {
                                     <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap">#</th>
                                     <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">ID</th>
                                     <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">SubCategoria</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Categoria</th>
                                     <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Estado</th>
                                     <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Acciones</th>
                                     {/* <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Eliminar</th> */}
@@ -193,6 +224,7 @@ export default function SubCategories() {
                                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap relative">{indexOfFirstUser + i + 1}</td>
                                             <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{cat.idSubCategoria}</td>
                                             <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{cat.subCategoria}</td>
+                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{cat.categoria ? cat.categoria : "-"}</td>
                                             <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{
                                                 cat.activo ?
                                                     <button className="text-3xl" onClick={() => updateStatus(cat.idSubCategoria, 0)}>
@@ -206,14 +238,14 @@ export default function SubCategories() {
                                                 <button
                                                     className="border border-button2 p-2 rounded-md bg-green-500 text-white"
                                                     title="editar"
-                                                    onClick={() => setAddAttribute({ idSubCategoria: cat.idSubCategoria, accion: "Actualizar ", attribute: "Categoria", value: cat.subCategoria })}
+                                                    onClick={() => setAddAttribute({ idSubCategoria: cat.idSubCategoria, accion: "Actualizar ", attribute: "Sub Categoria", value: cat.subCategoria })}
                                                 ><i className="bi bi-pencil-square"></i>
                                                 </button>
 
                                                 <button
                                                     className="border border-button2 p-2 rounded-md bg-red-500 text-white"
                                                     title="Vista previa"
-                                                // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}
+                                                    onClick={() => deleteSubCategoria(cat.idSubCategoria)}
                                                 // disabled={!this.state.reset}
                                                 ><i className="bi bi-trash3-fill"></i>
                                                 </button>
@@ -286,7 +318,7 @@ export default function SubCategories() {
                                     <button
                                         className="m-1 rounded-md text-white"
                                         title="Vista previa"
-                                    // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}  
+                                        onClick={() => deleteSubCategoria(cat.idSubCategoria)}
                                     // disabled={!this.state.reset}
                                     ><i className="bi bi-trash3-fill text-red-500"></i>
                                     </button>
@@ -299,12 +331,20 @@ export default function SubCategories() {
 
             {addAtribute && (
                 <ModalAddAttribute
-                    idcategoria={addAtribute.idSubCategoria}
+                    idAttribute={addAtribute.idSubCategoria}
                     accion={addAtribute.accion}
                     attribute={addAtribute.attribute}
                     value={addAtribute.value}
+                    categories={categorias}
                     onClose={() => setAddAttribute(null)}
                     onSaved={handleSavedAttribute}
+                />
+            )}
+
+            {deleteAttribute && (
+                <ModalAlert
+                    message={deleteAttribute}
+                    onClose={() => setDeleteAttribute(null)}
                 />
             )}
         </div>

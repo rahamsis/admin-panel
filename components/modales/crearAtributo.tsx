@@ -4,21 +4,26 @@
 import { useState } from "react";
 import { useTenant } from "@/app/context/dataContext";
 import { saveOrUpdateCategories, saveOrUpdateColor, saveOrUpdateMarca, saveOrUpdateSubCategories } from "@/lib/actions";
+import CustomSelect from "../select";
+import { Categoria } from "@/types/producto";
 
 interface ModalAddCategorie {
-    idcategoria?: string;
+    idAttribute?: string;
     accion: string;
     attribute: string;
     value?: string;
+    categories?: Categoria[];
     onClose: () => void;
     onSaved: (result: any) => void;
 }
 
 
-export const ModalAddAttribute = ({ idcategoria, accion, attribute, value, onClose, onSaved }: ModalAddCategorie) => {
+export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categories, onClose, onSaved }: ModalAddCategorie) => {
     const { tenantId, userId } = useTenant();
     const [newAttribute, setNewAttribute] = useState(value || "");
     const [alert, setAlert] = useState("");
+
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("0");
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -27,12 +32,12 @@ export const ModalAddAttribute = ({ idcategoria, accion, attribute, value, onClo
             setAlert("Ingrese un valor para continuar")
             return;
         }
-
+        
         const result = attribute === "Categoria" ?
-            await saveOrUpdateCategories(tenantId || "", userId || "", idcategoria || "", newAttribute) : attribute === "Sub Categoria" ?
-                await saveOrUpdateSubCategories(tenantId || "", userId || "", newAttribute) : attribute === "Marca" ?
-                    await saveOrUpdateMarca(tenantId || "", userId || "", newAttribute) : attribute === "Color" ?
-                        await saveOrUpdateColor(tenantId || "", userId || "", newAttribute) : null;
+            await saveOrUpdateCategories(tenantId || "", userId || "", idAttribute || "", newAttribute) : attribute === "Sub Categoria" ?
+                await saveOrUpdateSubCategories(tenantId || "", userId || "", idAttribute || "", newAttribute, categoriaSeleccionada) : attribute === "Marca" ?
+                    await saveOrUpdateMarca(tenantId || "", userId || "", idAttribute || "", newAttribute) : attribute === "Color" ?
+                        await saveOrUpdateColor(tenantId || "", userId || "", idAttribute || "", newAttribute) : null;
         // 👇 avisamos al padre pasándole el resultado
         onSaved(result);
 
@@ -56,6 +61,23 @@ export const ModalAddAttribute = ({ idcategoria, accion, attribute, value, onClo
                     }}
                     className="border p-2 w-full focus:outline-none focus:border-cyan-500 focus:ring-cyan-500"
                 />
+
+                {categories && (
+                    <div className="pt-6">
+                        <label className="">Asociar a una categoria</label>
+                        <div className="pt-2">
+                            <CustomSelect
+                                options={categories}
+                                valueKey="idCategoria"
+                                labelKey="categoria"
+                                defaultValue="0"
+                                onChange={(value: string) => {
+                                    setCategoriaSeleccionada(value)
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
                 {alert && (
                     <label className="text-red-500 text-xs">{alert}</label>
                 )}
