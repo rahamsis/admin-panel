@@ -96,6 +96,8 @@ export default function Colors() {
     return (
         <div className="bg-white p-6 lg:rounded-xl shadow min-h-screen">
             <h2 className="text-xl font-semibold mb-4">Colores</h2>
+            
+            {/* contenido para PC */}
             <div className="flex flex-row w-full x:w-1/2 gap-4">
 
                 {/* Barra de búsqueda */}
@@ -138,7 +140,7 @@ export default function Colors() {
                 </div>
             </div>
 
-            {/* en mobiles ocultar */}
+            {/* en mobiles ocultar tabla de contenido*/}
             <div className="relative w-[calc(100vw-8rem)] md:w-[calc(100vw-15rem)] lg:w-[calc(100vw-18rem)] x:w-[calc(100vw-20rem)] rounded-lg hidden lg:block">
                 <div className="space-y-4 pt-4">
                     <div className="overflow-x-auto">
@@ -227,7 +229,7 @@ export default function Colors() {
                 </div>
             </div>
 
-            {/* en mobiles ocultar */}
+            {/* en mobiles ocultar menu de paginación*/}
             <div className="lg:flex flex-row mt-6 justify-between mr-10 hidden">
                 <div className="text-zinc-600 flex lg:text-base text-xs items-center">
                     <span>Mostrando {filteredColors.length === 0 ? 0 : indexOfFirstUser + 1} - {Math.min(indexOfLastColor, filteredColors.length)} de {colors.length} color(es)</span>
@@ -260,6 +262,7 @@ export default function Colors() {
                 </div>
             </div>
 
+            {/* contenido para mobiles */}
             <div className="lg:hidden mt-6">
                 {
                     currentColors.map((col, i) => (

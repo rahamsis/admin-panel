@@ -2,6 +2,7 @@
 
 import { Menu } from "@/types/menu";
 import { Producto } from "@/types/producto";
+import { WebSite } from "@/types/webSite";
 
 /* eslint-disable */
 
@@ -524,5 +525,56 @@ export async function saveMenu(tenant: string, body: Menu[]) {
     } catch (error) {
         console.error("Error al guardar el menu", error);
         throw new Error("Error al guardar el menu")
+    }
+}
+
+export async function getWebSite(tenant: string) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/get-website`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                "accept": "application/json"
+            },
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+
+        return data.map((row: WebSite) => ({
+            idEmpresa: row.idEmpresa,
+            nombre: row.nombre,
+            telefonoPrincipal: row.telefonoPrincipal,
+            telefonoSecundario: row.telefonoSecundario,
+            direccionPrincipal: row.direccionPrincipal,
+            direccionSecundaria: row.direccionSecundaria,
+            correo: row.correo
+        }));
+    } catch (error) {
+        console.error("Error al traer los datos de la compañia", error);
+        throw new Error("Error al traer los datos de la compañia")
+    }
+}
+
+export async function updateWebSite(tenant: string, body: WebSite) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/update-website`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                "accept": "application/json"
+            },
+            body: JSON.stringify(body),
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+        return data;
+        
+    } catch (error) {
+        console.error("Error al guardar los datos de la compañia", error);
+        throw new Error("Error al guardar los datos de la compañia")
     }
 }

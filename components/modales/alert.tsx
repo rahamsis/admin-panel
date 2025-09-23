@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 interface ModalAlert {
     message: string;
     onClose: () => void;

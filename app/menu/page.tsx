@@ -23,7 +23,7 @@ export default function MenuSelector() {
   // 🔹 Cargar categorías disponibles
   useEffect(() => {
     fetchData()
-  }, [tenantId]);
+  }, []);
 
 
   async function fetchData() {

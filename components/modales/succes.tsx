@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 interface ModalSucces {
     message: string;
     onClose: () => void;
