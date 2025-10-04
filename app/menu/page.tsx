@@ -77,7 +77,7 @@ export default function MenuSelector() {
 
   // 🔹 Agregar item
   const addItem = (item: Categoria) => {
-    if (selected.length >= 6) return; // máximo 6
+    if (selected.length >= 8) return; // máximo 6
     if (selected.some((i) => i.idCategoria === item.idCategoria)) return; // evitar duplicados
     setSelected([...selected, item]);
     setAvailable(available.filter((i) => i.idCategoria !== item.idCategoria));

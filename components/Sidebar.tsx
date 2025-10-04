@@ -273,14 +273,55 @@ const Sidebar = () => {
         {/* Navegación */}
         {(!isMobile || isSidebarOpen) && (
           <nav className="flex-1 space-y-2 text-zinc-400 mt-2">
+
+            <Link
+              href={"/dashboard"}
+              className={`px-4 flex items-center gap-2 p-2 hover:bg-sidebarDark overflow-hidden ${pathname === "/dashboard" ? "bg-sidebarDark text-white" : ""}`}
+            >
+              <i className="bi bi-house-door-fill"></i>
+              <span
+                onClick={() => { if (isMobile) setIsSidebarOpen(false) }}
+                className={`transition-all duration-500 ease-in-out ${isSidebarOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}`}
+              >
+                Dashboard
+              </span>
+            </Link>
+
+            <div className="border-t" />
+
+            <div>
+              <a className="font-semibold ml-3">TIENDA</a>
+            </div>
+
             {[
-              { href: "/dashboard", icon: "bi-house-door-fill", label: "Dashboard" },
               { href: "/settings", icon: "bi-gear-fill", label: "Configuración" },
               { href: "/products", icon: "bi-box-seam-fill", label: "Productos" },
               { href: "/categories", icon: "bi-clipboard-data-fill", label: "Categorias" },
               { href: "/sub-categories", icon: "bi-hdd-stack-fill", label: "SubCategorias" },
               { href: "/brands", icon: "bi-handbag-fill", label: "Marcas" },
               { href: "/colors", icon: "bi-palette-fill", label: "Colores" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`px-4 flex items-center gap-2 p-2 hover:bg-sidebarDark overflow-hidden ${pathname === item.href ? "bg-sidebarDark text-white" : ""}`}
+              >
+                <i className={`bi ${item.icon}`}></i>
+                <span
+                  onClick={() => { if (isMobile) setIsSidebarOpen(false) }}
+                  className={`transition-all duration-500 ease-in-out ${isSidebarOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0"}`}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            ))}
+
+            <div className="border-t" />
+
+            <div>
+              <a className="font-semibold ml-3">PERSONALIZAR</a>
+            </div>
+            {[
               { href: "/menu", icon: "bi bi-menu-button-wide-fill", label: "Menu" },
             ].map((item) => (
               <Link

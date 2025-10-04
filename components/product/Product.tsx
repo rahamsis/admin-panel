@@ -323,10 +323,7 @@ export default function Product({ data }: ProductProps) {
         fd.append("activo", String(formData.activo));
         fd.append("userId", String(userId));
         fd.append("fotoDeleted", JSON.stringify(fotoDeleted));
-        fd.append("rutaCloudinary", String(
-            createRutaCloudinary(tenantId || "",
-                formData.categoria)
-        ))
+        fd.append("rutaCloudinary", formData.fotos[0].rutaCloudinary)
         fd.append("nuevaRutaCloudinary", String(
             createRutaCloudinary(tenantId || "",
                 nombreCategoriaSeleccionada)
