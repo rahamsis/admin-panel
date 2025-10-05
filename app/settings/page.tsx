@@ -118,7 +118,7 @@ export default function Settings() {
             </div>
 
             {/* Teléfono Principal */}
-            <div className="flex lg:flex-row flex-col gap-6 justify-between lg:items-center my-2">
+            {/* <div className="flex lg:flex-row flex-col gap-6 justify-between lg:items-center my-2">
               <label className="font-medium">Teléfono Principal</label>
               <input
                 type="text"
@@ -127,7 +127,26 @@ export default function Settings() {
                 className="w-full lg:w-3/4 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
                 placeholder="Teléfono principal"
               />
+            </div> */}
+            <div className="flex lg:flex-row flex-col gap-6 justify-between lg:items-center my-2">
+              <label className="font-medium">Teléfono Principal</label>
+              <input
+                type="text"
+                value={website.telefonoPrincipal}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Solo números y máximo 9 dígitos
+                  if (/^\d{0,9}$/.test(value)) {
+                    handleChange("telefonoPrincipal", value);
+                  }
+                }}
+                className="w-full lg:w-3/4 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
+                placeholder="Teléfono principal"
+                maxLength={9} // por seguridad adicional
+                inputMode="numeric" // en móviles muestra teclado numérico
+              />
             </div>
+
 
             {/* Teléfono Secundario */}
             <div className="flex lg:flex-row flex-col gap-6 justify-between lg:items-center my-2">
@@ -135,9 +154,17 @@ export default function Settings() {
               <input
                 type="text"
                 value={website.telefonoSecundario}
-                onChange={(e) => handleChange("telefonoSecundario", e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Solo números y máximo 9 dígitos
+                  if (/^\d{0,9}$/.test(value)) {
+                    handleChange("telefonoSecundario", value);
+                  }
+                }}
                 className="w-full lg:w-3/4 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
                 placeholder="Teléfono secundario"
+                maxLength={9} // por seguridad adicional
+                inputMode="numeric" // en móviles muestra teclado numérico
               />
             </div>
 
