@@ -379,7 +379,7 @@ export default function Product({ data }: ProductProps) {
             }))));
         }
         
-        // console.log("datos a enviar:", Object.fromEntries(fd.entries()));
+        console.log("datos a enviar:", Object.fromEntries(fd.entries()));
         const res = formData.idProducto
             ? await updateProduct(tenantId || "", fd)
             : await saveProduct(tenantId || "", fd);
