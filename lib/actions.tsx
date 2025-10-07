@@ -117,6 +117,7 @@ export async function getAllBrands(tenant: string) {
         return data.map((row: any) => ({
             idMarca: row.idMarca,
             marca: row.marca,
+            urlFoto: row.urlFoto,
             activo: row.activo
         }));
     } catch (error) {
@@ -284,16 +285,38 @@ export async function deleteSubCategorie(tenant: string, idSubCategoria: string)
     }
 }
 
-export async function saveOrUpdateMarca(tenant: string, userId: string, idmarca: string, marca: string) {
+export async function saveOrUpdateMarca(tenant: string, formData: FormData) {
     try {
         const response = await fetch(`${process.env.APP_BACK_END}/update-or-save-marca`, {
             method: 'POST',
+            headers: {
+                // 'Content-Type': 'application/json',
+                "X-Tenant-ID": tenant,
+                'accept': '/'
+            },
+            body: formData,
+            next: { revalidate: 0 }
+        });
+
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error('Error al actualizar o guardar la marca:', error);
+        throw new Error("Error al actualizar o guardar la marca");
+    }
+}
+
+export async function deleteMarca(tenant: string, idMarca: string) {
+    try {
+        const response = await fetch(`${process.env.APP_BACK_END}/delete-brand`, {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 "X-Tenant-ID": tenant,
                 'accept': '/'
             },
-            body: JSON.stringify({ userId, idmarca, marca }),
+            body: JSON.stringify({ idMarca }),
             next: { revalidate: 0 }
         });
 
@@ -302,8 +325,8 @@ export async function saveOrUpdateMarca(tenant: string, userId: string, idmarca:
         return data;
 
     } catch (error) {
-        console.error('Error al actualizar o guardar la marca:', error);
-        throw new Error("Error al actualizar o guardar la marca");
+        console.error('Error al eliminar la marca:', error);
+        throw new Error("Error al eliminar la marca");
     }
 }
 
@@ -572,7 +595,7 @@ export async function updateWebSite(tenant: string, body: WebSite) {
 
         const data = await response.json();
         return data;
-        
+
     } catch (error) {
         console.error("Error al guardar los datos de la compañia", error);
         throw new Error("Error al guardar los datos de la compañia")

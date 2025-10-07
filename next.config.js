@@ -51,6 +51,21 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "10mb", // ajusta según necesidad
     },
+    // Añadir esto para evitar el warning Cross origin
+    allowedDevOrigins: (() => {
+      if (process.env.NODE_ENV !== "development") return [];
+      const localDomains = [
+        "localhost",
+        "127.0.0.1",
+        "admin.depsac.local",
+        "importonyperu.local",
+        "cygrefrisac.local",
+      ];
+      return localDomains.flatMap((domain) => [
+        `http://${domain}:3000`,
+        `https://${domain}`,
+      ]);
+    })(),
   },
 };
 

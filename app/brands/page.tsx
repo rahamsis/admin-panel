@@ -3,11 +3,12 @@
 /* eslint-disable */
 
 import { useEffect, useState } from "react";
-import { getAllBrands, updateStatusBrand, } from "@/lib/actions";
-import Link from "next/link";
+import { deleteMarca, getAllBrands, updateStatusBrand, } from "@/lib/actions";
+import Image from "next/image";
 import { useTenant } from "@/app/context/dataContext";
 import type { Marca, } from "@/types/producto";
 import { ModalAddAttribute } from "@/components/modales/crearAtributo";
+import { ModalAlert } from "@/components/modales/alert";
 
 export default function Brands() {
     const { tenantId } = useTenant();
@@ -32,9 +33,10 @@ export default function Brands() {
 
     const [showDeleteText, setShowDeleteText] = useState(false);
 
-    const [addAtribute, setAddAttribute] = useState<{ idMarca: string, accion: string, attribute: string, value: string } | null>(null)
+    const [addAtribute, setAddAttribute] = useState<{ idMarca: string, accion: string, attribute: string, value: string, imagen: string } | null>(null)
+    const [deleteAttribute, setDeleteAttribute] = useState<string | null>(null)
 
-    // llenar los productos
+    // llenar las marcas
     useEffect(() => {
 
         async function fetchData() {
@@ -93,6 +95,18 @@ export default function Brands() {
         setMarcas(updatedMarcas);
     }
 
+    const deleteBrand = async (idMarca: string) => {
+        const result = await deleteMarca(tenantId || "", idMarca);
+
+        if (result.result?.affectedRows) {
+            // 👇 recargar todas las sub categorías
+            const updatedBrands = await getAllBrands(tenantId || "");
+            setMarcas(updatedBrands);
+        } else {
+            setDeleteAttribute(result.message)
+        }
+    }
+
     return (
         <div className="bg-white p-6 lg:rounded-xl shadow min-h-screen">
             <h2 className="text-xl font-semibold mb-4">Marcas</h2>
@@ -127,13 +141,13 @@ export default function Brands() {
                 {/* Botón de agregar usuario */}
                 <div className='hidden lg:flex lg:flex-row border'>
                     <button
-                        className='bg-cyan-500 text-white px-4 py-2 rounded flex flex-row' onClick={() => setAddAttribute({ idMarca: "", accion: "Crear ", attribute: "Marca", value: "" })}>
+                        className='bg-cyan-500 text-white px-4 py-2 rounded flex flex-row' onClick={() => setAddAttribute({ idMarca: "", accion: "Crear ", attribute: "Marca", value: "", imagen: "" })}>
                         <i className="bi bi-plus-circle mr-2"></i>
                         Nuevo
                     </button>
                 </div>
 
-                <div className="lg:hidden text-cyan-500 text-3xl" title="Agregar marca" onClick={() => setAddAttribute({ idMarca: "", accion: "Crear ", attribute: "Marca", value: "" })}>
+                <div className="lg:hidden text-cyan-500 text-3xl" title="Agregar marca" onClick={() => setAddAttribute({ idMarca: "", accion: "Crear ", attribute: "Marca", value: "", imagen: "" })}>
                     <i className="bi bi-plus-circle-fill"></i>
                 </div>
             </div>
@@ -147,6 +161,7 @@ export default function Brands() {
                                 <tr className="bg-gray-300">
                                     <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap">#</th>
                                     <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">ID</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Imagen</th>
                                     <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Marca</th>
                                     <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Estado</th>
                                     <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Acciones</th>
@@ -193,6 +208,15 @@ export default function Brands() {
                                         <tr key={i} className="odd:bg-white even:bg-gray-100">
                                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap relative">{indexOfFirstUser + i + 1}</td>
                                             <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{mar.idMarca}</td>
+                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
+                                                <Image
+                                                    src={mar.urlFoto}
+                                                    alt={mar.marca}
+                                                    width={50}
+                                                    height={50}
+                                                    priority={true}
+                                                />
+                                            </td>
                                             <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{mar.marca}</td>
                                             <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{
                                                 mar.activo ?
@@ -207,15 +231,14 @@ export default function Brands() {
                                                 <button
                                                     className="border border-button2 p-2 rounded-md bg-green-500 text-white"
                                                     title="editar"
-                                                    onClick={() => setAddAttribute({ idMarca: mar.idMarca, accion: "Actualizar ", attribute: "Marca", value: mar.marca })}
+                                                    onClick={() => setAddAttribute({ idMarca: mar.idMarca, accion: "Actualizar ", attribute: "Marca", value: mar.marca, imagen: mar.urlFoto })}
                                                 ><i className="bi bi-pencil-square"></i>
                                                 </button>
 
                                                 <button
                                                     className="border border-button2 p-2 rounded-md bg-red-500 text-white"
-                                                    title="Vista previa"
-                                                // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}
-                                                // disabled={!this.state.reset}
+                                                    title="eliminar"
+                                                    onClick={() => deleteBrand(mar.idMarca)}
                                                 ><i className="bi bi-trash3-fill"></i>
                                                 </button>
                                             </td>
@@ -264,10 +287,20 @@ export default function Brands() {
                 {
                     currentMarcas.map((marca, i) => (
                         <div key={i} className="border border-gray-300 rounded-lg p-4 mb-4 bg-white shadow-sm">
-                            <div className="flex justify-between items-center mb-2">
-                                <div>
-                                    <h3 className="text-lg">{marca.marca}</h3>
-                                    <p className="text-sm text-gray-500">ID: {marca.idMarca}</p>
+                            <div className="flex items-center justify-between gap-2 w-full">
+                                {/* --- IZQUIERDA: imagen + datos --- */}
+                                <div className="flex items-center gap-2">
+                                    <Image
+                                        src={marca.urlFoto}
+                                        alt={marca.marca}
+                                        width={50}
+                                        height={50}
+                                        priority={true}
+                                    />
+                                    <div>
+                                        <h3 className="text-lg">{marca.marca}</h3>
+                                        <p className="text-sm text-gray-500">ID: {marca.idMarca}</p>
+                                    </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     {marca.activo ?
@@ -281,14 +314,13 @@ export default function Brands() {
                                     <button
                                         className="m-2 rounded-md text-white"
                                         title="editar"
-                                        onClick={() => setAddAttribute({ idMarca: marca.idMarca, accion: "Actualizar ", attribute: "Marca", value: marca.marca })}
+                                        onClick={() => setAddAttribute({ idMarca: marca.idMarca, accion: "Actualizar ", attribute: "Marca", value: marca.marca, imagen: marca.urlFoto })}
                                     ><i className="bi bi-pencil-square text-cyan-500"></i>
                                     </button>
                                     <button
                                         className="m-1 rounded-md text-white"
                                         title="Vista previa"
-                                    // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}  
-                                    // disabled={!this.state.reset}
+                                        onClick={() => deleteBrand(marca.idMarca)}
                                     ><i className="bi bi-trash3-fill text-red-500"></i>
                                     </button>
                                 </div>
@@ -304,8 +336,16 @@ export default function Brands() {
                     accion={addAtribute.accion}
                     attribute={addAtribute.attribute}
                     value={addAtribute.value}
+                    imagen={addAtribute.imagen}
                     onClose={() => setAddAttribute(null)}
                     onSaved={handleSavedAttribute}
+                />
+            )}
+
+            {deleteAttribute && (
+                <ModalAlert
+                    message={deleteAttribute}
+                    onClose={() => setDeleteAttribute(null)}
                 />
             )}
         </div>

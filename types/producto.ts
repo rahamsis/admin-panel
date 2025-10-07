@@ -52,6 +52,7 @@ export interface SubCategoria {
 export interface Marca {
     idMarca: string;
     marca: string;
+    urlFoto: string;
     activo: boolean;
 }
 
