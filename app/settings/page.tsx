@@ -43,7 +43,6 @@ export default function Settings() {
     async function fetchData() {
       try {
         const data = await getWebSite(tenantId || "");
-        console.log(data)
         if (data.length > 0) {
           setWebsite(data[0]);
           if (data[0].logo) setPreview({ urlFoto: data[0].logo })
