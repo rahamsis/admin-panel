@@ -37,13 +37,13 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
     // aplica solo al modal de subcategoria para que sea asociado a una categoria
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("0");
 
-    const [preview, setPreview] = useState<FotoPreview | null>(null);
+    const [previewAttribute, setPreviewAttribute] = useState<FotoPreview | null>(null);
     const [alertImagen, setAlertImagen] = useState("");
 
-    // sincronizar los preview si hubiera imagen
+    // sincronizar los previewAttribute si hubiera imagen
     useEffect(() => {
         if (imagen) {
-            setPreview({ urlFoto: imagen });
+            setPreviewAttribute({ urlFoto: imagen });
         }
     }, [imagen]);
 
@@ -56,19 +56,19 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
             file,
         };
 
-        setPreview(selected);
+        setPreviewAttribute(selected);
         setAlertImagen("");
         e.target.value = "";
     };
 
     const handleRemove = () => {
-        setPreview(null);
+        setPreviewAttribute(null);
     };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
 
-        if (attribute.toLowerCase() === "marca" && !preview) {
+        if (attribute.toLowerCase() === "marca" && !previewAttribute) {
             setAlertImagen("Ingrese una imagen para continuar")
             return;
         }
@@ -83,8 +83,8 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
         formdata.append("userId", String(userId));
         formdata.append("idAttribute", String(idAttribute));
         formdata.append("newAttribute", String(newAttribute));
-        if (preview?.file) {
-            formdata.append("file", preview.file);
+        if (previewAttribute?.file) {
+            formdata.append("file", previewAttribute.file);
         }
 
         const result = attribute === "Categoria"
@@ -110,14 +110,14 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
                 </div>
 
                 {attribute.toLowerCase() === "marca" &&
-                    // Imagenes y preview de imagenes
+                    // Imagenes y previewAttribute de imagenes
                     < div className="flex flex-col pb-4">
                         {/* Imagenes del producto */}
                         <div className="">
                             {/* Input oculto */}
                             <input
                                 type="file"
-                                id="fileInput"
+                                id="fileInputAttribute"
                                 accept="image/png"
                                 multiple
                                 onChange={handleSelect}
@@ -127,9 +127,9 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
                             {/* Cuadrícula de previews */}
                             <div className="flex lg:flex-row flex-row justify-center gap-4">
                                 {/* Botón cuadrado para seleccionar */}
-                                {preview === null && (
+                                {previewAttribute === null && (
                                     <label
-                                        htmlFor="fileInput"
+                                        htmlFor="fileInputAttribute"
                                         className="w-full h-28 border-2 flex items-center justify-center cursor-pointer hover:border-cyan-500 hover:border-2"
                                     >
                                         <CirclePlus className="text-gray-400 w-10 h-10"></CirclePlus>
@@ -137,11 +137,11 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
                                 )}
 
                                 {/* Imágenes seleccionadas */}
-                                {preview !== null && (
+                                {previewAttribute !== null && (
                                     <div className="relative w-full h-28 border">
                                         <img
-                                            src={preview.urlFoto}
-                                            alt={`preview-${attribute}`}
+                                            src={previewAttribute.urlFoto}
+                                            alt={`previewAttribute-${attribute}`}
                                             className="w-full h-full object-cover"
                                         />
                                         <button

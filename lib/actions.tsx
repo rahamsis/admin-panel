@@ -572,7 +572,8 @@ export async function getWebSite(tenant: string) {
             telefonoSecundario: row.telefonoSecundario,
             direccionPrincipal: row.direccionPrincipal,
             direccionSecundaria: row.direccionSecundaria,
-            correo: row.correo
+            correo: row.correo,
+            logo: row.logo
         }));
     } catch (error) {
         console.error("Error al traer los datos de la compañia", error);
@@ -580,16 +581,16 @@ export async function getWebSite(tenant: string) {
     }
 }
 
-export async function updateWebSite(tenant: string, body: WebSite) {
+export async function updateWebSite(tenant: string, formData: FormData) {
     try {
         const response = await fetch(`${process.env.APP_BACK_END}/update-website`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                // 'Content-Type': 'application/json',
                 "X-Tenant-ID": tenant,
-                "accept": "application/json"
+                "accept": "/"
             },
-            body: JSON.stringify(body),
+            body: formData,
             next: { revalidate: 0 }
         });
 

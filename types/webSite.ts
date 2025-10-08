@@ -6,4 +6,5 @@ export interface WebSite {
     direccionPrincipal: string;
     direccionSecundaria: string;
     correo: string;
+    logo: string;
 }

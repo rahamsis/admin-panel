@@ -62,7 +62,7 @@ const nextConfig = {
         "cygrefrisac.local",
       ];
       return localDomains.flatMap((domain) => [
-        `http://${domain}:3000`,
+        `http://${domain}:2002`,
         `https://${domain}`,
       ]);
     })(),

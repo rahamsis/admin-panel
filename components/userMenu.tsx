@@ -101,8 +101,8 @@ export default function UserMenu() {
             }
           </div>
 
-          <Link href="/registro" className="px-5 flex justify-between w-full py-2 text-sm md:text-base text-primary hover:text-white hover:bg-cyan-500 transition-all duration-200 ease-in-out">
-            <i className="bi bi-gear-wide-connected mr-2"></i>Modificar perfil
+          <Link href="/registro" className="px-3 flex w-full py-2 text-sm md:text-base text-primary hover:text-white hover:bg-cyan-500 transition-all duration-200 ease-in-out">
+            <i className="bi bi-gear-wide-connected mr-2"></i> <span className="text-base">Modificar perfil</span>
           </Link>
 
           <div
@@ -112,7 +112,7 @@ export default function UserMenu() {
               // router.push("/");
 
             }}
-            className="px-5 flex justify-between w-full py-2 cursor-pointer text-sm md:text-base text-primary hover:text-white hover:bg-cyan-500 transition-all duration-200 ease-in-out"
+            className="px-3 flex w-full py-2 cursor-pointer text-sm md:text-base text-primary hover:text-white hover:bg-cyan-500 transition-all duration-200 ease-in-out"
           >
             <i className="bi bi-power mr-2"></i> Cerrar sesión
           </div>
