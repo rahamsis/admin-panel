@@ -30,5 +30,6 @@ export const config = {
         "/colors",
         "/settings",
         "/menu",
+        "/banners",
     ],
 };
