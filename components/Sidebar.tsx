@@ -323,7 +323,11 @@ const Sidebar = () => {
             </div>
             {[
               { href: "/menu", icon: "bi bi-menu-button-wide-fill", label: "Menu" },
-            ].map((item) => (
+              // temporal:
+             tenantId === "cygrefrisac" ? { href: "/banners", icon: "bi bi-card-image", label: "Banners" } : null
+            ]
+            .filter((item): item is NonNullable<typeof item> => item !== null)
+            .map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

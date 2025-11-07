@@ -8,3 +8,9 @@ export interface WebSite {
     correo: string;
     logo: string;
 }
+
+export interface Banner {
+    idBanner: string;
+    urlBanner: string;
+    posicion: string;
+}

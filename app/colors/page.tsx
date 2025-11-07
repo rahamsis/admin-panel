@@ -4,7 +4,6 @@
 
 import { useEffect, useState } from "react";
 import { getAllColors, updateStatusColor } from "@/lib/actions";
-import Link from "next/link";
 import { useTenant } from "@/app/context/dataContext";
 import type { Color } from "@/types/producto";
 import { ModalAddAttribute } from "@/components/modales/crearAtributo";
@@ -108,7 +107,7 @@ export default function Colors() {
                     {/* Input */}
                     <input
                         type="text"
-                        placeholder="Buscar Subcategoria ..."
+                        placeholder="Buscar Colores ..."
                         className="w-full pl-10 pr-10 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-button"
                         value={searchTerm}
                         onChange={(e) => {
@@ -126,7 +125,7 @@ export default function Colors() {
                     )}
                 </div>
 
-                {/* Botón de agregar usuario */}
+                {/* Botón de agregar color */}
                 <div className='hidden lg:flex lg:flex-row'>
                     <button
                         className='bg-cyan-500 text-white px-4 py-2 rounded flex flex-row' onClick={() => setAddAttribute({ idColor: "", accion: "Crear ", attribute: "Color", value: "" })}>

@@ -138,7 +138,7 @@ export default function Settings() {
                 <input
                   type="file"
                   id="fileInputAttribute"
-                  accept="image/png"
+                  accept="image/png, image/jpeg"
                   multiple
                   onChange={handleSelect}
                   className="hidden"
