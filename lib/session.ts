@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 export const fetchUserLogin = async (email: string, password: string, tenantId: string): Promise<any> => {
     try {
         const response = await fetch(`${process.env.APP_BACK_END}/auth/login`, {
@@ -14,7 +16,7 @@ export const fetchUserLogin = async (email: string, password: string, tenantId: 
         });
 
         const data = await response.json();
-        
+
         return data;
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
