@@ -4,20 +4,64 @@
 /* eslint-disable */
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn, } from "next-auth/react";
 import { Mail, LockKeyhole, Eye, EyeClosed } from "lucide-react";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ email?: string[]; password?: string[] }>({});
+
+  //sleep 
+  // const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // Manejo de cambios en los inputs
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    // Eliminar espacios en blanco mientras el usuario escribe
+    const sanitizedValue = value.replace(/\s+/g, "");
+
+    // Actualizar estados correctos
+    if (name === "email") setEmail(sanitizedValue);
+    if (name === "password") setPassword(sanitizedValue);
+
+    // Limpiar error del campo que está siendo modificado
+    setErrors((prevErrors) => {
+      // Si ya no hay error en ese campo, devolver prevErrors tal cual
+      if (!prevErrors[name as keyof typeof prevErrors]) return prevErrors;
+
+      // Crear copia y eliminar error del campo actual
+      const updatedErrors = { ...prevErrors };
+      delete updatedErrors[name as keyof typeof prevErrors];
+
+      return updatedErrors;
+    });
+
+    setMessage(null)
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const nuevosErrores: { email?: string[]; password?: string[] } = {};
+
+    if (!email?.trim()) nuevosErrores.email = ["El correo es obligatorio"];
+    if (!password?.trim()) nuevosErrores.password = ["La contraseña es obligatoria"];
+
+    if (Object.keys(nuevosErrores).length > 0) {
+      setErrors(nuevosErrores);
+      return;
+    }
+
+    setErrors({});
     setMessage(null);
     setIsLoading(true);
 
@@ -25,20 +69,29 @@ export default function LoginPage() {
     const tenantId = hostname.replace("admin.", "").split(".")[0];
 
     try {
-      const origin = window.location.origin;
+      // const origin = window.location.origin;
       const res = await signIn("credentials", {
         email,
         password,
         tenantId,
-        redirect: true,
-        callbackUrl: `${origin}/dashboard`,
+        redirect: false, // Evita redirección automática
+        // callbackUrl: `${origin}/dashboard`,
       });
+
+      console.log("SignIn response:", res);
+
+      // Simula una espera para propósitos de demostración
+      // await sleep(5000);
 
       if (!res?.ok) {
         setIsLoading(false);
         setMessage(res?.error!);
         return;
       }
+
+      // Redirige manualmente después de un inicio de sesión exitoso
+      // window.location.href = "/dashboard";
+      router.push("/dashboard");
     } catch (error) {
       console.error("Login error:", error)
       setMessage("Error al iniciar sesión");
@@ -58,35 +111,39 @@ export default function LoginPage() {
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-600">Iniciar sesión</h2>
 
         <div>
-          <label htmlFor="email" className="block mb-1">
-            Email
-          </label>
+          <label htmlFor="email" className="block mb-1"> Email </label>
           <div className="relative">
             <input
               type="email"
-              placeholder="Email"
+              id="email"
+              name="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleChange}
               className="w-full px-3 py-2 border rounded pl-10 focus:outline-none"
-              required
+              placeholder="Ingrese un email"
             />
             <Mail className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-secondary peer-focus:text-gray-900" />
           </div>
+          {
+            errors.email &&
+            <p className="mt-2 text-sm text-red-500" >
+              {errors.email}
+            </p>
+          }
         </div>
 
 
         <div>
-          <label htmlFor="password" className="block mb-1">
-            Contraseña
-          </label>
+          <label htmlFor="password" className="block mb-1"> Contraseña </label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Contraseña"
+              id="password"
+              name="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handleChange}
               className="w-full px-3 py-1 border rounded pl-10"
-              required
+              placeholder="Ingrese una contraseña"
             />
             <button
               type="button"
@@ -99,6 +156,12 @@ export default function LoginPage() {
             </button>
             <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-secondary peer-focus:text-gray-900" />
           </div>
+          {
+            errors.password &&
+            <p className="mt-2 text-sm text-red-500" >
+              {errors.password}
+            </p>
+          }
         </div>
 
         {

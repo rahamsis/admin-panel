@@ -1,6 +1,7 @@
 // pages/api/auth/[...nextauth].ts
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { fetchUserLogin } from "./session";
 
 type User = {
     id: string;
@@ -29,32 +30,37 @@ const authOptions: NextAuthOptions = {
         CredentialsProvider({
             name: "Credentials",
             credentials: {
-                email: { label: "Email", type: "text" },
-                password: { label: "Password", type: "password" },
-                tenantId: { label: "Tenant", type: "text" },
+                email: {},
+                password: {},
+                tenantId: {},
             },
-            async authorize(credentials) {
-                const res = await fetch(`${process.env.APP_BACK_END}/auth/login`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-tenant-id": credentials?.tenantId || "",
-                    },
-                    body: JSON.stringify({
-                        email: credentials?.email,
-                        password: credentials?.password,
-                    }),
-                });
+            async authorize(credentials: any) {
+                const { email, password, tenantId } = credentials;
 
-                const data = await res.json();
-                if (!res.ok) return null;
+                try {
+                    const response = await fetchUserLogin(email as string, password as string, tenantId as string);
 
-                return { ...data.user, accessToken: data.access_token, tenantId: credentials?.tenantId };
+                    if (!response || !response.user) {
+                        throw new Error(response?.message || "Credenciales inválidas");
+                    }
+
+                    return { ...response, accessToken: response.access_token, tenantId: credentials?.tenantId };
+                } catch (error) {
+                    if (error instanceof Error) {
+                        throw new Error(error.message || "Error. Credenciales Invalidas");
+                    } else {
+                        throw new Error("Error!. Credenciales Invalidas");
+                    }
+                }
             },
         }),
     ],
     session: {
         strategy: "jwt",
+        maxAge: 10 * 60 * 60 // 8 horas
+    },
+    jwt: {
+        maxAge: 10 * 60 * 60 // 8 horas
     },
     callbacks: {
         async jwt({ token, user }) {
@@ -62,6 +68,7 @@ const authOptions: NextAuthOptions = {
                 token.accessToken = (user as User).accessToken;
                 token.tenantId = (user as User).tenantId;
                 token.userId = (user as User).id || "";
+                token.perfil = (user as User).perfil || "";
             }
             return token;
         },
@@ -71,27 +78,9 @@ const authOptions: NextAuthOptions = {
             session.user = session.user || {};
             session.user.userId = token.userId as string | undefined;
             session.user.tenantId = token.tenantId as string | undefined;
+            session.user.perfil = token.perfil as string | undefined;
             return session;
         },
-        // async redirect({ url, baseUrl }) {
-        //     try {
-        //         const currentOrigin =
-        //             typeof window !== "undefined"
-        //                 ? window.location.origin
-        //                 : baseUrl; // en server, cae a baseUrl
-
-        //         // Si url es relativo => lo juntamos con el origen actual
-        //         if (url.startsWith("/")) return `${currentOrigin}${url}`;
-
-        //         // Si la url tiene el mismo dominio que el actual => la permitimos
-        //         if (new URL(url).origin === currentOrigin) return url;
-
-        //         // Default: dashboard en el dominio actual
-        //         return `${currentOrigin}/dashboard`;
-        //     } catch (e) {
-        //         return `${baseUrl}/dashboard`;
-        //     }
-        // },
         async redirect({ url, baseUrl }) {
             // Si ya viene una URL absoluta, respétala (aunque no coincida con NEXTAUTH_URL)
             if (url.startsWith("http")) return url;

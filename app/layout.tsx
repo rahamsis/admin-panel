@@ -20,13 +20,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions);
-  
   return (
     <html lang="en">
       <body>
         <Providers>
-          <ClientLayout session={session}>{children}</ClientLayout>
+          <ClientLayout>{children}</ClientLayout>
         </Providers>
       </body>
     </html>
