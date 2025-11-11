@@ -38,6 +38,7 @@ export default function Brands() {
 
     // llenar las marcas
     useEffect(() => {
+        if (!tenantId) return;  // prevenir la primera ejecución vacía
 
         async function fetchData() {
             // if (!session?.user) return;
@@ -54,7 +55,7 @@ export default function Brands() {
         }
 
         fetchData();
-    }, []);
+    }, [tenantId]);
 
     const updateStatus = async (idMarca: string, status: number) => {
         // 1️⃣ Guardamos el valor previo (para poder revertir en caso de error)

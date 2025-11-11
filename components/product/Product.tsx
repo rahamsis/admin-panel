@@ -139,8 +139,10 @@ export default function Product({ data }: ProductProps) {
   }, [data]);
 
   useEffect(() => {
+    if (!tenantId) return;  // prevenir la primera ejecución vacía
+
     setValuesToDropdowns();
-  }, []);
+  }, [tenantId]);
 
   // sincronizar los preview si hubiera imagen
   useEffect(() => {
@@ -323,7 +325,7 @@ export default function Product({ data }: ProductProps) {
     fd.append("activo", String(formData.activo));
     fd.append("userId", String(userId));
     fd.append("fotoDeleted", JSON.stringify(fotoDeleted));
-    fd.append("rutaCloudinary", formData.fotos[0].rutaCloudinary)
+    fd.append("rutaCloudinary", formData.fotos[0]?.rutaCloudinary ?? "");
     fd.append("nuevaRutaCloudinary", String(
       createRutaCloudinary(tenantId || "",
         nombreCategoriaSeleccionada)

@@ -35,10 +35,11 @@ export default function SubCategories() {
     const [showDeleteText, setShowDeleteText] = useState(false);
 
     const [addAtribute, setAddAttribute] = useState<{ idSubCategoria: string, accion: string, attribute: string, value: string } | null>(null)
-    const [deleteAttribute, setDeleteAttribute] = useState< string | null>(null)
+    const [deleteAttribute, setDeleteAttribute] = useState<string | null>(null)
 
     // llenar las subcategorias
     useEffect(() => {
+        if (!tenantId) return;  // prevenir la primera ejecución vacía
 
         async function fetchData() {
             // if (!session?.user) return;
@@ -55,10 +56,11 @@ export default function SubCategories() {
         }
 
         fetchData();
-    }, []);
+    }, [tenantId]);
 
     // llenar las categorias
     useEffect(() => {
+        if (!tenantId) return;  // prevenir la primera ejecución vacía
 
         async function fetchData() {
             try {
@@ -70,7 +72,7 @@ export default function SubCategories() {
         }
 
         fetchData();
-    }, []);
+    }, [tenantId]);
 
     const updateStatus = async (idSubCategorie: string, status: number) => {
         // 1️⃣ Guardamos el valor previo (para poder revertir en caso de error)

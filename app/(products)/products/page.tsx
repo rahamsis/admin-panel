@@ -1,7 +1,5 @@
 "use client";
 
-/* eslint-disable */
-
 import { useEffect, useState } from "react";
 import { getAllProduct, updateStatusProduct } from "@/lib/actions";
 import Link from "next/link";
@@ -34,6 +32,7 @@ export default function Products() {
 
     // llenar los productos
     useEffect(() => {
+        if (!tenantId) return;  // prevenir la primera ejecución vacía
 
         async function fetchData() {
             // if (!session?.user) return;
@@ -50,7 +49,7 @@ export default function Products() {
         }
 
         fetchData();
-    }, []);
+    }, [tenantId]);
 
     const updateStatus = async (idProduct: string, status: number) => {
 

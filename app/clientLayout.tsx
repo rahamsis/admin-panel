@@ -1,8 +1,6 @@
 // // app/ClientLayout.tsx (client component)
 "use client";
 
-/* eslint-disable */
-
 import { useSession } from "next-auth/react";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";

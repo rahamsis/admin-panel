@@ -14,7 +14,6 @@ type User = {
     userDevice: string | null | undefined;
     userIp: string | null | undefined;
     accessToken?: string | null | undefined;
-    welcome?: number | null | undefined;
     menu?: string[] | null | undefined;
     perfil?: string | null | undefined;
 };
@@ -46,7 +45,9 @@ const authOptions: NextAuthOptions = {
                         throw new Error(response?.message || "Credenciales inválidas");
                     }
 
-                    return { ...response, accessToken: response.access_token, tenantId: credentials?.tenantId };
+                    const user = response.user;
+
+                    return { id:user.id, perfil: user.perfil, accessToken: response.access_token, tenantId: credentials?.tenantId };
                 } catch (error) {
                     if (error instanceof Error) {
                         throw new Error(error.message || "Error. Credenciales Invalidas");

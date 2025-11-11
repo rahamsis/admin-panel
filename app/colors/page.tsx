@@ -35,6 +35,7 @@ export default function Colors() {
 
     // llenar los productos
     useEffect(() => {
+        if (!tenantId) return;  // prevenir la primera ejecución vacía
 
         async function fetchData() {
             // if (!session?.user) return;
@@ -51,7 +52,7 @@ export default function Colors() {
         }
 
         fetchData();
-    }, []);
+    }, [tenantId]);
 
     const updateStatus = async (idColor: string, status: number) => {
         // 1️⃣ Guardamos el valor previo (para poder revertir en caso de error)
@@ -95,7 +96,7 @@ export default function Colors() {
     return (
         <div className="bg-white p-6 lg:rounded-xl shadow min-h-screen">
             <h2 className="text-xl font-semibold mb-4">Colores</h2>
-            
+
             {/* contenido para PC */}
             <div className="flex flex-row w-full x:w-1/2 gap-4">
 

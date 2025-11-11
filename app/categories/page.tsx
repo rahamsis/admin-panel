@@ -35,6 +35,7 @@ export default function Categories() {
 
     // llenar los productos
     useEffect(() => {
+        if (!tenantId) return;  // prevenir la primera ejecución vacía
 
         async function fetchData() {
             // if (!session?.user) return;
@@ -51,7 +52,7 @@ export default function Categories() {
         }
 
         fetchData();
-    }, []);
+    }, [tenantId]);
 
     const updateStatus = async (idCategoria: string, status: number) => {
         // 1️⃣ Guardamos el valor previo (para poder revertir en caso de error)
