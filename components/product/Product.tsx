@@ -25,7 +25,7 @@ import {
   updateProduct
 } from "@/lib/actions";
 import { ModalAddAttribute } from "../modales/crearAtributo";
-import { createRutaCloudinary } from "@/lib/util";
+// import { createRutaCloudinary } from "@/lib/util";
 import Image from "next/image";
 
 type ProductProps = {
@@ -326,10 +326,10 @@ export default function Product({ data }: ProductProps) {
     fd.append("userId", String(userId));
     fd.append("fotoDeleted", JSON.stringify(fotoDeleted));
     fd.append("rutaCloudinary", formData.fotos[0]?.rutaCloudinary ?? "");
-    fd.append("nuevaRutaCloudinary", String(
-      createRutaCloudinary(tenantId || "",
-        nombreCategoriaSeleccionada)
-    ))
+    // fd.append("nuevaRutaCloudinary", String(
+    //   createRutaCloudinary(tenantId || "",
+    //     nombreCategoriaSeleccionada)
+    // ))
 
     // Items a eliminar (estaban antes pero ya no están)
     const toRemove = packItemsFromDb.filter(

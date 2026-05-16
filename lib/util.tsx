@@ -1,8 +1,8 @@
-export function createRutaCloudinary(tenant: string, categoria: string) {
-    return [tenant, categoria.toLowerCase()]
-        .filter(Boolean)
-        .join("/") + "/";
-}
+// export function createRutaCloudinary(tenant: string, categoria: string) {
+//     return [tenant, categoria.toLowerCase()]
+//         .filter(Boolean)
+//         .join("/") + "/";
+// }
 
 
 export const urlToFile = async (url: string, filename: string): Promise<File> => {

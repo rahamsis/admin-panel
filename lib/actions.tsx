@@ -43,8 +43,8 @@ export async function getAllProduct(tenant: string) {
       productospaquete: row.productospaquete
     }));
   } catch (error) {
-    console.error('Error al obtener los productos destacados o nuevos o más vendidos:', error);
-    throw new Error("Error al obtener los productos destacados o nuevos o más vendidos");
+    console.error('Error al obtener los productos ', error);
+    throw new Error("Error al obtener los productos ");
   }
 }
 
@@ -383,13 +383,12 @@ export async function getProductById(tenant: string, idProduct: string) {
       idColor: row.idColor,
       color: row.color,
       descripcion: row.descripcion,
-      rutaCloudinary: row.rutaCloudinary,
       destacado: row.destacado,
       nuevo: row.nuevo,
       masVendido: row.masVendido,
       activo: row.activo,
-      fotos: row.fotos,
-      productospaquete: row.productospaquete
+      fotos: JSON.parse(row.fotos),
+      productospaquete: JSON.parse(row.productospaquete)
     } as Producto;
   } catch (error) {
     console.error('Error al obtener los productos por ID:', error);

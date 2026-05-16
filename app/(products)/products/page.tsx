@@ -51,6 +51,10 @@ export default function Products() {
         fetchData();
     }, [tenantId]);
 
+    // useEffect(() => {
+    //     console.log("Current Products:", currentProducts[0]);
+    // }, [currentProducts]);
+
     const updateStatus = async (idProduct: string, status: number) => {
 
         // Optimistic update: actualizar UI inmediatamente

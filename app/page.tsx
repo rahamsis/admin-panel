@@ -78,7 +78,7 @@ export default function LoginPage() {
         // callbackUrl: `${origin}/dashboard`,
       });
 
-      console.log("SignIn response:", res);
+      // console.log("SignIn response:", res);
 
       // Simula una espera para propósitos de demostración
       // await sleep(5000);
