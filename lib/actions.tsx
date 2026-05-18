@@ -17,9 +17,9 @@ export async function getAllProduct(tenant: string) {
       },
       next: { revalidate: 0 }
     });
-
+    console.log("Respuesta cruda del backend antes de mapear:", await response.json());
     const data: Producto[] = await response.json();
-
+    console.log("Datos crudos obtenidos del backend:", data);
     return data.map((row) => ({
       idProducto: row.idProducto,
       idCategoria: row.idCategoria,

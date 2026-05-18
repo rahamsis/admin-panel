@@ -40,6 +40,7 @@ export default function Products() {
             try {
                 setIsLoading(true);
                 const data = await getAllProduct(tenantId || "");
+                console.log("Productos obtenidos:", data);
                 setProducts(data);
             } catch (error) {
                 console.error("Error obteniendo los productos", error);
