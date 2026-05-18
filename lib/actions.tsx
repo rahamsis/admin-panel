@@ -19,8 +19,7 @@ export async function getAllProduct(tenant: string) {
     });
 
     const data = await response.json();
-    console.log("Datos crudos obtenidos del backend:", data);
-    
+
     return data.map((row: any) => ({
       idProducto: row.idProducto,
       idCategoria: row.idCategoria,
