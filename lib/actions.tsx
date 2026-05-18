@@ -17,10 +17,11 @@ export async function getAllProduct(tenant: string) {
       },
       next: { revalidate: 0 }
     });
-    console.log("Respuesta cruda del backend antes de mapear:", await response.json());
-    const data: Producto[] = await response.json();
+
+    const data = await response.json();
     console.log("Datos crudos obtenidos del backend:", data);
-    return data.map((row) => ({
+    
+    return data.map((row: any) => ({
       idProducto: row.idProducto,
       idCategoria: row.idCategoria,
       categoria: row.categoria,
@@ -41,7 +42,7 @@ export async function getAllProduct(tenant: string) {
       activo: row.activo,
       fotos: row.fotos,
       productospaquete: row.productospaquete
-    }));
+    })) as Producto[];
   } catch (error) {
     console.error('Error al obtener los productos ', error);
     throw new Error("Error al obtener los productos ");
