@@ -387,8 +387,8 @@ export async function getProductById(tenant: string, idProduct: string) {
       nuevo: row.nuevo,
       masVendido: row.masVendido,
       activo: row.activo,
-      fotos: JSON.parse(row.fotos),
-      productospaquete: JSON.parse(row.productospaquete)
+      fotos: row.fotos,
+      productospaquete: row.productospaquete
     } as Producto;
   } catch (error) {
     console.error('Error al obtener los productos por ID:', error);
