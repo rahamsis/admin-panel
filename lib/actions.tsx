@@ -620,6 +620,8 @@ export async function getBanners(tenant: string) {
       idBanner: row.idBanner,
       urlBanner: row.urlBanner,
       posicion: row.posicion,
+      titulo: row.titulo,
+      descripcion: row.descripcion
     }));
   } catch (error) {
     console.error("Error al traer los banners", error);
@@ -646,6 +648,27 @@ export async function insertBanners(tenant: string, formData: FormData) {
   } catch (error) {
     console.error("Error al guardar los banners", error);
     throw new Error("Error al guardar los banners")
+  }
+}
+
+export async function updateBanners(tenant: string, formData: FormData) {
+  try {
+    const response = await fetch(`${process.env.APP_BACK_END}/update-banners`, {
+      method: 'PUT',
+      headers: {
+        "X-Tenant-ID": tenant,
+        "accept": "/"
+      },
+      body: formData,
+      next: { revalidate: 0 }
+    });
+
+    const data = await response.json();
+    return data;
+
+  } catch (error) {
+    console.error("Error al actualizar los banners", error);
+    throw new Error("Error al actualizar los banners")
   }
 }
 
