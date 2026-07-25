@@ -150,7 +150,8 @@ const Sidebar = () => {
             {[
               { href: "/menu", icon: "bi bi-menu-button-wide-fill", label: "Menu" },
               // temporal:
-              tenantId === "cygrefrisac" ? { href: "/banners", icon: "bi bi-card-image", label: "Banners" } : null
+              tenantId === "cygrefrisac" ? { href: "/banners", icon: "bi bi-card-image", label: "Banners" } : null,
+              tenantId === "cygrefrisac" ? { href: "/video", icon: "bi bi-file-play", label: "Video" } : null,
             ]
               .filter((item): item is NonNullable<typeof item> => item !== null)
               .map((item) => (

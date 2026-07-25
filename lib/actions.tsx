@@ -2,6 +2,7 @@
 
 import { Menu } from "@/types/menu";
 import { Producto } from "@/types/producto";
+import { VideoPrincipal } from "@/types/videoPrincipal";
 import { WebSite, Banner } from "@/types/webSite";
 
 /* eslint-disable */
@@ -675,6 +676,69 @@ export async function updateBanners(tenant: string, formData: FormData) {
 export async function removeBanners(tenant: string, idBanner: String) {
   try {
     const response = await fetch(`${process.env.APP_BACK_END}/delete-banners?idBanner=${idBanner}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        "X-Tenant-ID": tenant,
+        "accept": "/"
+      },
+      next: { revalidate: 0 }
+    });
+
+    const data = await response.json();
+    return data;
+
+  } catch (error) {
+    console.error("Error al eliminar el banner", error);
+    throw new Error("Error al guardar el banner")
+  }
+}
+
+export async function getVideo(tenant: string) {
+  try {
+    const response = await fetch(`${process.env.APP_BACK_END}/get-video`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        "X-Tenant-ID": tenant,
+        "accept": "application/json"
+      },
+      next: { revalidate: 0 }
+    });
+    const data = await response.json();
+
+    return data[0]
+  } catch (error) {
+    console.error("Error al traer el video", error);
+    throw new Error("Error al traer el video")
+  }
+}
+
+export async function saveVideo(tenant: string, body: VideoPrincipal) {
+  try {
+    const response = await fetch(`${process.env.APP_BACK_END}/save-video`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        "X-Tenant-ID": tenant,
+        "accept": "/"
+      },
+      body: JSON.stringify(body),
+      next: { revalidate: 0 }
+    });
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error al guardar el video", error);
+    throw new Error("Error al guardar el video")
+  }
+}
+
+export async function deleteVideo(tenant: string, idVideo: String) {
+  try {
+    const response = await fetch(`${process.env.APP_BACK_END}/delete-video?idVideo=${idVideo}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
