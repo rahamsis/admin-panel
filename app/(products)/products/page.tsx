@@ -118,7 +118,7 @@ export default function Products() {
                     )}
                 </div>
 
-                {/* Botón de agregar usuario */}
+                {/* Botón de agregar producto */}
                 <div className=''>
                     <Link href="/addProduct">
                         <button
@@ -129,7 +129,7 @@ export default function Products() {
                     </Link>
 
                     <Link href="/addProduct">
-                        <div className="lg:hidden text-cyan-500 text-3xl" title="Agregar categoria" >
+                        <div className="lg:hidden text-cyan-500 text-3xl" title="Agregar producto" >
                             <i className="bi bi-plus-circle-fill"></i>
                         </div>
                     </Link>
@@ -187,7 +187,7 @@ export default function Products() {
                                 ) : currentProducts.length === 0 ? (
                                     <tr>
                                         <td colSpan={10} className="text-center py-4 text-gray-400">
-                                            No se encontraron usuarios.
+                                            No se encontraron productos.
                                         </td>
                                     </tr>
                                 ) : (

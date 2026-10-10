@@ -319,13 +319,13 @@ export default function Product({ data }: ProductProps) {
     fd.append("precio", String(formData.precio));
     fd.append("descripcion", formData.descripcion);
     fd.append("cantidad", String(formData.cantidad));
-    fd.append("destacado", String(formData.destacado));
-    fd.append("nuevo", String(formData.nuevo));
-    fd.append("masVendido", String(formData.masVendido));
-    fd.append("activo", String(formData.activo));
+    fd.append("destacado", String(Number(formData.destacado)));
+    fd.append("nuevo", String(Number(formData.nuevo)));
+    fd.append("masVendido", String(Number(formData.masVendido)));
+    fd.append("activo", String(Number(formData.activo)));
     fd.append("userId", String(userId));
     fd.append("fotoDeleted", JSON.stringify(fotoDeleted));
-    fd.append("rutaCloudinary", formData.fotos[0]?.rutaCloudinary ?? "");
+    fd.append("rutaCloudinary", formData.fotos[0]?.rutaCloudinary ?? `${tenantId}/productos`);
     // fd.append("nuevaRutaCloudinary", String(
     //   createRutaCloudinary(tenantId || "",
     //     nombreCategoriaSeleccionada)
