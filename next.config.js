@@ -36,7 +36,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "oishipop.com.pe",
+        hostname: "samarnature.com.pe",
         pathname: "/**",
       },
       // Cloudflare R2
@@ -60,6 +60,8 @@ const nextConfig = {
         "admin.depsac.local",
         "importonyperu.local",
         "cygrefrisac.local",
+        "lezcor.local",
+        "samarnature.local",
       ];
       return localDomains.flatMap((domain) => [
         `http://${domain}:2002`,
