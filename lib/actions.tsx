@@ -66,6 +66,7 @@ export async function getAllCategories(tenant: string) {
     return data.map((row: any) => ({
       idCategoria: row.idCategoria,
       categoria: row.categoria,
+      urlFoto: row.urlFoto,
       activo: row.activo
     }));
   } catch (error) {
@@ -217,16 +218,16 @@ export async function updateProduct(tenant: string, formData: FormData) {
   }
 }
 
-export async function saveOrUpdateCategories(tenant: string, userId: string, idCategoria: string, categoria: string) {
+export async function saveOrUpdateCategories(tenant: string, formData: FormData) {
   try {
     const response = await fetch(`${process.env.APP_BACK_END}/update-or-save-categorie`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/json',
         "X-Tenant-ID": tenant,
         'accept': '/'
       },
-      body: JSON.stringify({ userId, categoria, idCategoria }),
+      body: formData,
       next: { revalidate: 0 }
     });
 

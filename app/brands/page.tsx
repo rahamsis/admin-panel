@@ -211,7 +211,7 @@ export default function Brands() {
                                             <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{mar.idMarca}</td>
                                             <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
                                                 <Image
-                                                    src={mar.urlFoto}
+                                                    src={mar.urlFoto ? mar.urlFoto : "/images/default.png"}
                                                     alt={mar.marca}
                                                     width={50}
                                                     height={50}
@@ -292,7 +292,7 @@ export default function Brands() {
                                 {/* --- IZQUIERDA: imagen + datos --- */}
                                 <div className="flex items-center gap-2">
                                     <Image
-                                        src={marca.urlFoto}
+                                        src={marca.urlFoto ? marca.urlFoto : "/images/default.png"}
                                         alt={marca.marca}
                                         width={50}
                                         height={50}

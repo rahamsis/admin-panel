@@ -7,6 +7,7 @@ import { getAllCategories, updateStatusCategorie, } from "@/lib/actions";
 import { useTenant } from "@/app/context/dataContext";
 import type { Categoria } from "@/types/producto";
 import { ModalAddAttribute } from "@/components/modales/crearAtributo";
+import Image from "next/image";
 
 export default function Categories() {
     const { tenantId } = useTenant();
@@ -31,7 +32,7 @@ export default function Categories() {
 
     const [showDeleteText, setShowDeleteText] = useState(false);
 
-    const [addAtribute, setAddAttribute] = useState<{ idCategoria: string, accion: string, attribute: string, value: string } | null>(null)
+    const [addAtribute, setAddAttribute] = useState<{ idCategoria: string, accion: string, attribute: string, value: string, imagen: string } | null>(null)
 
     // llenar los productos
     useEffect(() => {
@@ -126,13 +127,13 @@ export default function Categories() {
 
                 {/* Botón de agregar usuario */}
                 <div className='hidden lg:flex lg:flex-row border'>
-                    <button className='bg-cyan-500 text-white px-4 py-2 rounded flex flex-row' onClick={() => setAddAttribute({ idCategoria: "", accion: "Crear ", attribute: "Categoria", value: "" })}>
+                    <button className='bg-cyan-500 text-white px-4 py-2 rounded flex flex-row' onClick={() => setAddAttribute({ idCategoria: "", accion: "Crear ", attribute: "Categoria", value: "", imagen: "" })}>
                         <i className="bi bi-plus-circle mr-2"></i>
                         Nuevo
                     </button>
                 </div>
 
-                <div className="lg:hidden text-cyan-500 text-3xl" title="Agregar categoria" onClick={() => setAddAttribute({ idCategoria: "", accion: "Crear ", attribute: "Categoria", value: "" })}>
+                <div className="lg:hidden text-cyan-500 text-3xl" title="Agregar categoria" onClick={() => setAddAttribute({ idCategoria: "", accion: "Crear ", attribute: "Categoria", value: "", imagen: "" })}>
                     <i className="bi bi-plus-circle-fill"></i>
                 </div>
             </div>
@@ -146,6 +147,7 @@ export default function Categories() {
                                 <tr className="bg-gray-300">
                                     <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap">#</th>
                                     <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">ID</th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Imagen</th>
                                     <th className="border border-gray-300 px-4 py-2 text-left whitespace-nowrap">Categoria</th>
                                     <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Estado</th>
                                     <th className="border border-gray-300 px-4 py-2 text-center whitespace-nowrap">Acciones</th>
@@ -192,6 +194,15 @@ export default function Categories() {
                                         <tr key={i} className="odd:bg-white even:bg-gray-100">
                                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap relative">{indexOfFirstUser + i + 1}</td>
                                             <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{cat.idCategoria}</td>
+                                            <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
+                                                <Image
+                                                    src={cat.urlFoto ? cat.urlFoto : "/images/default.png"}
+                                                    alt={cat.categoria}
+                                                    width={50}
+                                                    height={50}
+                                                    priority={true}
+                                                />
+                                            </td>
                                             <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">{cat.categoria}</td>
                                             <td className="border border-gray-300 py-2 whitespace-nowrap text-center">{
                                                 cat.activo ?
@@ -206,13 +217,13 @@ export default function Categories() {
                                                 <button
                                                     className="border border-button2 p-2 rounded-md bg-green-500 text-white"
                                                     title="editar"
-                                                    onClick={() => setAddAttribute({ idCategoria: cat.idCategoria, accion: "Actualizar ", attribute: "Categoria", value: cat.categoria })}
+                                                    onClick={() => setAddAttribute({ idCategoria: cat.idCategoria, accion: "Actualizar ", attribute: "Categoria", value: cat.categoria, imagen: cat.urlFoto })}
                                                 ><i className="bi bi-pencil-square"></i>
                                                 </button>
 
                                                 <button
                                                     className="border border-button2 p-2 rounded-md bg-red-500 text-white"
-                                                    title="Vista previa"
+                                                    title="eliminar"
                                                 // onClick={() => setAddTalleres({ userId: user.userId, nombre: user.nombre + ' ' + (user.apellidos ? user.apellidos : '') })}
                                                 // disabled={!this.state.reset}
                                                 ><i className="bi bi-trash3-fill"></i>
@@ -263,10 +274,20 @@ export default function Categories() {
                 {
                     currentCategories.map((cat, i) => (
                         <div key={i} className="border border-gray-300 rounded-lg p-4 mb-4 bg-white shadow-sm">
-                            <div className="flex justify-between items-center mb-2">
-                                <div>
-                                    <h3 className="text-lg">{cat.categoria}</h3>
-                                    <p className="text-sm text-gray-500">ID: {cat.idCategoria}</p>
+                            <div className="flex items-center justify-between gap-2 w-full">
+
+                                <div className="flex items-center gap-2">
+                                    <Image
+                                        src={cat.urlFoto ? cat.urlFoto : "/images/default.png"}
+                                        alt={cat.categoria}
+                                        width={50}
+                                        height={50}
+                                        priority={true}
+                                    />
+                                    <div>
+                                        <h3 className="text-lg">{cat.categoria}</h3>
+                                        <p className="text-sm text-gray-500">ID: {cat.idCategoria}</p>
+                                    </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     {cat.activo ?
@@ -280,7 +301,7 @@ export default function Categories() {
                                     <button
                                         className="m-2 rounded-md text-white"
                                         title="editar"
-                                        onClick={() => setAddAttribute({ idCategoria: cat.idCategoria, accion: "Actualizar ", attribute: "Categoria", value: cat.categoria })}
+                                        onClick={() => setAddAttribute({ idCategoria: cat.idCategoria, accion: "Actualizar ", attribute: "Categoria", value: cat.categoria, imagen: cat.urlFoto })}
                                     ><i className="bi bi-pencil-square text-cyan-500"></i>
                                     </button>
                                     <button
@@ -303,6 +324,7 @@ export default function Categories() {
                     accion={addAtribute.accion}
                     attribute={addAtribute.attribute}
                     value={addAtribute.value}
+                    imagen={addAtribute.imagen}
                     onClose={() => setAddAttribute(null)}
                     onSaved={handleSavedAttribute}
                 />

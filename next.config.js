@@ -21,6 +21,11 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "importhnostony.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "depsac.com.pe",
         pathname: "/**",
       },
@@ -59,6 +64,7 @@ const nextConfig = {
         "127.0.0.1",
         "admin.depsac.local",
         "importonyperu.local",
+        "importhnostony.local",
         "cygrefrisac.local",
         "lezcor.local",
         "samarnature.local",

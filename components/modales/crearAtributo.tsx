@@ -1,7 +1,7 @@
 'use client'
 
 /* eslint-disable */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTenant } from "@/app/context/dataContext";
 import {
     saveOrUpdateCategories,
@@ -33,6 +33,8 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
     const { tenantId, userId } = useTenant();
     const [newAttribute, setNewAttribute] = useState(value || "");
     const [alert, setAlert] = useState("");
+    const [isSaving, setIsSaving] = useState(false);
+    const isSavingRef = useRef(false);
 
     // aplica solo al modal de subcategoria para que sea asociado a una categoria
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("0");
@@ -68,7 +70,7 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
     const handleSubmit = async (e: any) => {
         e.preventDefault();
 
-        if (attribute.toLowerCase() === "marca" && !previewAttribute) {
+        if ((attribute.toLowerCase() === "marca" || attribute.toLowerCase() === "categoria") && !previewAttribute) {
             setAlertImagen("Ingrese una imagen para continuar")
             return;
         }
@@ -78,28 +80,35 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
             return;
         }
 
-        //creamos el formData ya que no se puede mandar el file directamente:
-        const formdata = new FormData();
-        formdata.append("userId", String(userId));
-        formdata.append("idAttribute", String(idAttribute));
-        formdata.append("newAttribute", String(newAttribute));
-        if (previewAttribute?.file) {
-            formdata.append("file", previewAttribute.file);
+        if (isSavingRef.current) return;
+        isSavingRef.current = true;
+        setIsSaving(true);
+
+        try {
+            //creamos el formData ya que no se puede mandar el file directamente:
+            const formdata = new FormData();
+            formdata.append("userId", String(userId));
+            formdata.append("idAttribute", String(idAttribute));
+            formdata.append("newAttribute", String(newAttribute));
+            if (previewAttribute?.file) {
+                formdata.append("file", previewAttribute.file);
+            }
+
+            const result = attribute === "Categoria"
+                ? await saveOrUpdateCategories(tenantId || "", formdata)
+                : attribute === "Sub Categoria"
+                    ? await saveOrUpdateSubCategories(tenantId || "", userId || "", idAttribute || "", newAttribute, categoriaSeleccionada)
+                    : attribute === "Marca"
+                        ? await saveOrUpdateMarca(tenantId || "", formdata)
+                        : attribute === "Color"
+                            ? await saveOrUpdateColor(tenantId || "", userId || "", idAttribute || "", newAttribute) : null;
+
+            onSaved(result);
+            onClose();
+        } finally {
+            isSavingRef.current = false;
+            setIsSaving(false);
         }
-
-        const result = attribute === "Categoria"
-            ? await saveOrUpdateCategories(tenantId || "", userId || "", idAttribute || "", newAttribute)
-            : attribute === "Sub Categoria"
-                ? await saveOrUpdateSubCategories(tenantId || "", userId || "", idAttribute || "", newAttribute, categoriaSeleccionada)
-                : attribute === "Marca"
-                    ? await saveOrUpdateMarca(tenantId || "", formdata)
-                    : attribute === "Color"
-                        ? await saveOrUpdateColor(tenantId || "", userId || "", idAttribute || "", newAttribute) : null;
-
-        // 👇 avisamos al padre pasándole el resultado
-        onSaved(result);
-
-        onClose(); // cerrar modal si deseas
     };
 
     return (
@@ -109,7 +118,7 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
                     <h2 className="text-xl font-bold mb-4 text-secondary">{accion} {attribute}</h2>
                 </div>
 
-                {attribute.toLowerCase() === "marca" &&
+                {(attribute.toLowerCase() === "marca" ||attribute.toLowerCase() === "categoria") &&
                     // Imagenes y previewAttribute de imagenes
                     < div className="flex flex-col pb-4">
                         {/* Imagenes del producto */}
@@ -196,10 +205,24 @@ export const ModalAddAttribute = ({ idAttribute, accion, attribute, value, categ
                 )}
 
                 <div className="flex justify-end space-x-4 mt-4">
-                    <button onClick={handleSubmit} className="bg-cyan-500 text-white px-4 py-2 rounded">
-                        Guardar
+                    <button
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={isSaving}
+                        aria-busy={isSaving}
+                        className="bg-cyan-500 text-white px-4 py-2 rounded disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                        {isSaving ? (
+                            <span className="flex items-center">
+                                <svg className="mr-2 h-5 w-5 animate-spin" viewBox="0 0 24 24" aria-hidden="true">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l4-4-4-4v4a8 8 0 00-8 8H4z" />
+                                </svg>
+                                Guardando...
+                            </span>
+                        ) : "Guardar"}
                     </button>
-                    <button onClick={onClose} className="px-4 py-2 border rounded-lg">
+                    <button type="button" onClick={onClose} disabled={isSaving} className="px-4 py-2 border rounded-lg disabled:cursor-not-allowed disabled:opacity-70">
                         Cancelar
                     </button>
                 </div>

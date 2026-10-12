@@ -38,6 +38,7 @@ export interface ProductosPaquete {
 export interface Categoria {
     idCategoria: string;
     categoria: string;
+    urlFoto: string;
     activo: boolean;
 }
 

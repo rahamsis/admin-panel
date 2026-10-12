@@ -36,7 +36,6 @@ export default function MenuSelector() {
 
       //cargamos el menu existente 
       const result = await getMenus(tenantId);
-      console.log("Menu existente: ", result);
       const menuAsCategorias: Categoria[] = result.map((m: Menu) => ({
         idCategoria: m.idCategoria,
         categoria: m.titulo,
